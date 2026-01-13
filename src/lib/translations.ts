@@ -43,8 +43,8 @@ export const translations = {
     en: "Sign in",
   },
   "auth.signInDescription": {
-    da: "Log ind på din Emergency Food Tracker konto",
-    en: "Sign in to your Emergency Food Tracker account",
+    da: "Log ind på din Prepper Helper konto",
+    en: "Sign in to your Prepper Helper account",
   },
   "auth.signInWithPromise": {
     da: "Log ind med Promise",
