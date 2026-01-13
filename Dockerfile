@@ -1,10 +1,12 @@
+# syntax=docker/dockerfile:1.4
+
 # Stage 1: Dependencies
 FROM node:22-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 # Stage 2: Builder
 FROM node:22-alpine AS builder
@@ -17,9 +19,9 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build the application
+# Build the application with cache
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+RUN --mount=type=cache,target=/app/.next/cache npm run build
 
 # Stage 3: Runner
 FROM node:22-alpine AS runner
