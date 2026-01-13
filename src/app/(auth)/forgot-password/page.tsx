@@ -19,7 +19,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
-import Image from "next/image";
+import { AnimatedLogo } from "@/components/ui/animated-logo";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -90,13 +90,7 @@ export default function ForgotPasswordPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Image
-              src="/icon.png"
-              alt={t("app.name")}
-              width={64}
-              height={64}
-              className="rounded-xl shadow-lg"
-            />
+            <AnimatedLogo size={80} />
           </div>
           <CardTitle className="text-2xl">{t("auth.forgotPassword")}</CardTitle>
           <CardDescription>{t("auth.forgotPasswordDescription")}</CardDescription>

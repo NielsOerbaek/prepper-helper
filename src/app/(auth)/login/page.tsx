@@ -22,7 +22,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, Shield } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
-import Image from "next/image";
+import { AnimatedLogo } from "@/components/ui/animated-logo";
 
 const formSchema = z.object({
   email: z.string().email("Indtast venligst en gyldig email"),
@@ -86,13 +86,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Image
-              src="/icon.png"
-              alt={t("app.name")}
-              width={64}
-              height={64}
-              className="rounded-xl shadow-lg"
-            />
+            <AnimatedLogo size={80} />
           </div>
           <CardTitle className="text-2xl">{t("app.name")}</CardTitle>
           <CardDescription>{t("auth.signInDescription")}</CardDescription>

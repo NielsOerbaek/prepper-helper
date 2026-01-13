@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/lib/language-context";
+import { AnimatedLogo } from "@/components/ui/animated-logo";
 import { Camera, Bell, ClipboardList, Warehouse, Globe, Check } from "lucide-react";
 
 export default function AboutPage() {
@@ -32,13 +32,9 @@ export default function AboutPage() {
       <h1 className="text-3xl font-bold">{t("settings.about")}</h1>
 
       <div className="flex flex-col items-center text-center py-8">
-        <Image
-          src="/icon.png"
-          alt={t("app.name")}
-          width={80}
-          height={80}
-          className="rounded-xl shadow-lg mb-4"
-        />
+        <div className="mb-4">
+          <AnimatedLogo size={100} />
+        </div>
         <h1 className="text-3xl font-bold mb-2">{t("about.title")}</h1>
         <p className="text-muted-foreground max-w-md">{t("about.description")}</p>
         <p className="text-sm text-muted-foreground mt-2">
