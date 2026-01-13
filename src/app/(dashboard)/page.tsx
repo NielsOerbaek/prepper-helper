@@ -98,7 +98,7 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold mb-2">{t("dashboard.scanAnItem")}</h2>
           <p className="text-center mb-4 text-muted-foreground">{t("dashboard.scanDescription")}</p>
           <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
-            <Link href="/scan">
+            <Link href="/inventory?scan=true">
               <Camera className="mr-2 h-5 w-5" />
               {t("dashboard.startScanner")}
             </Link>
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                 <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>{t("dashboard.noItemsYet")}</p>
                 <Button className="mt-2" asChild>
-                  <Link href="/scan">{t("dashboard.addFirstItem")}</Link>
+                  <Link href="/inventory?scan=true">{t("dashboard.addFirstItem")}</Link>
                 </Button>
               </div>
             )}
@@ -184,7 +184,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="grid gap-2">
             <Button variant="outline" className="justify-start" asChild>
-              <Link href="/scan">
+              <Link href="/inventory?scan=true">
                 <Camera className="mr-2 h-4 w-4" />
                 {t("dashboard.scanNewItem")}
               </Link>

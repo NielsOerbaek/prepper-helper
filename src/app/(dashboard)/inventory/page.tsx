@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ItemCard } from "@/components/items/item-card";
@@ -29,6 +30,8 @@ interface Item {
 export default function InventoryPage() {
   const { t, language } = useLanguage();
   const { currentStash, isLoading: stashLoading } = useStash();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -36,6 +39,15 @@ export default function InventoryPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+
+  // Auto-open scanner if ?scan=true in URL
+  useEffect(() => {
+    if (searchParams.get("scan") === "true" && !stashLoading && currentStash) {
+      setShowScanner(true);
+      // Clear the query param
+      router.replace("/inventory", { scroll: false });
+    }
+  }, [searchParams, stashLoading, currentStash, router]);
   const [showVerifyDialog, setShowVerifyDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [currentItemId, setCurrentItemId] = useState<string | null>(null);
