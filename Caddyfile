@@ -1,7 +1,3 @@
 prep.raakode.dk {
     reverse_proxy app:3000
 }
-
-s3.prep.raakode.dk {
-    reverse_proxy minio:9000
-}
