@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ExpirationBadge } from "@/components/items/expiration-badge";
 import { useLanguage } from "@/lib/language-context";
+import { useStash } from "@/lib/stash-context";
 import { Package, ClipboardList, AlertTriangle, ArrowRight, Camera } from "lucide-react";
 
 interface DashboardStats {
@@ -21,30 +22,48 @@ interface DashboardStats {
 
 export default function DashboardPage() {
   const { t } = useLanguage();
+  const { currentStash, isLoading: stashLoading } = useStash();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
+      if (!currentStash) {
+        setStats({
+          totalItems: 0,
+          expiringItems: 0,
+          checklistProgress: { checked: 0, total: 0 },
+          recentItems: [],
+        });
+        setLoading(false);
+        return;
+      }
+
       try {
+        const stashParam = `stashId=${currentStash.id}`;
         const [itemsRes, checklistRes, expiringRes] = await Promise.all([
-          fetch("/api/items"),
-          fetch("/api/checklist"),
-          fetch("/api/items?expiringSoon=true"),
+          fetch(`/api/items?${stashParam}`),
+          fetch(`/api/checklist?${stashParam}`),
+          fetch(`/api/items?${stashParam}&expiringSoon=true`),
         ]);
 
         const items = await itemsRes.json();
         const checklist = await checklistRes.json();
         const expiring = await expiringRes.json();
 
+        // Handle potential error responses
+        const itemsArray = Array.isArray(items) ? items : [];
+        const checklistArray = Array.isArray(checklist) ? checklist : [];
+        const expiringArray = Array.isArray(expiring) ? expiring : [];
+
         setStats({
-          totalItems: items.length,
-          expiringItems: expiring.length,
+          totalItems: itemsArray.length,
+          expiringItems: expiringArray.length,
           checklistProgress: {
-            checked: checklist.filter((item: { isChecked: boolean }) => item.isChecked).length,
-            total: checklist.length,
+            checked: checklistArray.filter((item: { isChecked: boolean }) => item.isChecked).length,
+            total: checklistArray.length,
           },
-          recentItems: items.slice(0, 5).map((item: { id: string; name: string; expirationDate: string | null }) => ({
+          recentItems: itemsArray.slice(0, 5).map((item: { id: string; name: string; expirationDate: string | null }) => ({
             ...item,
             expirationDate: item.expirationDate ? new Date(item.expirationDate) : null,
           })),
@@ -56,10 +75,12 @@ export default function DashboardPage() {
       }
     }
 
-    fetchStats();
-  }, []);
+    if (!stashLoading) {
+      fetchStats();
+    }
+  }, [currentStash, stashLoading]);
 
-  if (loading) {
+  if (loading || stashLoading) {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">{t("nav.dashboard")}</h1>

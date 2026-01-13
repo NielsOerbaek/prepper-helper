@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ItemCard } from "@/components/items/item-card";
 import { ItemForm } from "@/components/items/item-form";
+import { ItemLightbox } from "@/components/items/item-lightbox";
 import { ScanVerifyDialog } from "@/components/items/scan-verify-dialog";
 import { CameraCapture } from "@/components/photos/camera-capture";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CATEGORY_LABELS } from "@/types";
 import { Category } from "@prisma/client";
-import { Plus, Search, Filter, Loader2, LayoutGrid, List, Trash2 } from "lucide-react";
+import { Plus, Search, Filter, Loader2, LayoutGrid, List, Trash2, Pencil } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/language-context";
 import { useStash } from "@/lib/stash-context";
@@ -24,6 +26,7 @@ interface Item {
   category: Category;
   quantity: number;
   expirationDate: Date | null;
+  createdAt: Date;
   photos: Array<{ id: string; minioKey: string; originalName: string | null }>;
 }
 
@@ -65,6 +68,7 @@ export default function InventoryPage() {
     expirationBase64?: string;
   } | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [lightboxItem, setLightboxItem] = useState<Item | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
     if (typeof window !== "undefined") {
       return (localStorage.getItem("inventoryViewMode") as "grid" | "list") || "grid";
@@ -89,9 +93,10 @@ export default function InventoryPage() {
       const data = await response.json();
 
       setItems(
-        data.map((item: Item & { expirationDate: string | null }) => ({
+        data.map((item: Item & { expirationDate: string | null; createdAt: string }) => ({
           ...item,
           expirationDate: item.expirationDate ? new Date(item.expirationDate) : null,
+          createdAt: new Date(item.createdAt),
         }))
       );
     } catch (error) {
@@ -129,6 +134,7 @@ export default function InventoryPage() {
         {
           ...newItem,
           expirationDate: newItem.expirationDate ? new Date(newItem.expirationDate) : null,
+          createdAt: new Date(newItem.createdAt),
         },
         ...prev,
       ]);
@@ -166,6 +172,7 @@ export default function InventoryPage() {
                 expirationDate: updatedItem.expirationDate
                   ? new Date(updatedItem.expirationDate)
                   : null,
+                createdAt: new Date(updatedItem.createdAt),
               }
             : item
         )
@@ -396,16 +403,16 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between w-full">
-        <h1 className="text-3xl font-bold">{t("inventory.title")}</h1>
-        <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold truncate">{t("inventory.title")}</h1>
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <div className="flex border rounded-md">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => handleViewModeChange("grid")}
               title={t("inventory.viewGrid")}
-              className="rounded-r-none"
+              className="rounded-r-none h-8 w-8 sm:h-9 sm:w-9 p-0"
             >
               <LayoutGrid className="h-4 w-4" />
             </Button>
@@ -414,14 +421,14 @@ export default function InventoryPage() {
               size="sm"
               onClick={() => handleViewModeChange("list")}
               title={t("inventory.viewList")}
-              className="rounded-l-none"
+              className="rounded-l-none h-8 w-8 sm:h-9 sm:w-9 p-0"
             >
               <List className="h-4 w-4" />
             </Button>
           </div>
-          <Button variant="outline" onClick={() => setShowScanner(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t("inventory.addItem")}
+          <Button variant="outline" size="sm" onClick={() => setShowScanner(true)} className="h-8 sm:h-9">
+            <Plus className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">{t("inventory.addItem")}</span>
           </Button>
         </div>
       </div>
@@ -494,54 +501,74 @@ export default function InventoryPage() {
             <thead className="bg-muted/50">
               <tr>
                 <th className="text-left px-4 py-3 font-medium">{t("item.name")}</th>
-                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">{t("item.category")}</th>
-                <th className="text-center px-4 py-3 font-medium">{t("item.quantity")}</th>
-                <th className="text-left px-4 py-3 font-medium hidden md:table-cell">{t("item.expirationDate")}</th>
-                <th className="px-4 py-3 w-10"></th>
+                <th className="text-center px-4 py-3 font-medium">{t("item.expirationDate")}</th>
+                <th className="text-center px-4 py-3 font-medium w-16 hidden sm:table-cell">{t("item.quantity")}</th>
+                <th className="px-4 py-3 w-24"></th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {items.map((item) => {
-                const isExpiringSoon = item.expirationDate &&
-                  new Date(item.expirationDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-                const isExpired = item.expirationDate && new Date(item.expirationDate) < new Date();
+                const daysLeft = item.expirationDate
+                  ? Math.ceil((new Date(item.expirationDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                  : null;
+                const isExpired = daysLeft !== null && daysLeft < 0;
+                const isExpiringSoon = daysLeft !== null && daysLeft >= 0 && daysLeft <= 30;
                 return (
                   <tr
                     key={item.id}
                     className="hover:bg-muted/30 cursor-pointer"
-                    onClick={() => {
-                      const itemToEdit = items.find((i) => i.id === item.id);
-                      if (itemToEdit) setEditingItem(itemToEdit);
-                    }}
+                    onClick={() => setLightboxItem(item)}
                   >
                     <td className="px-4 py-3">
-                      <span className="font-medium" title={item.name}>{item.name}</span>
+                      <div>
+                        <span className="font-medium" title={item.name}>{item.name}</span>
+                        {item.description && (
+                          <p className="text-xs text-muted-foreground line-clamp-1">{item.description}</p>
+                        )}
+                      </div>
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      <span className="text-muted-foreground">{t(getCategoryKey(item.category))}</span>
-                    </td>
-                    <td className="px-4 py-3 text-center">{item.quantity}</td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      {item.expirationDate ? (
-                        <span className={isExpired ? "text-destructive" : isExpiringSoon ? "text-orange-500" : ""}>
-                          {new Date(item.expirationDate).toLocaleDateString(language)}
-                        </span>
+                    <td className="px-4 py-3 text-center">
+                      {daysLeft !== null ? (
+                        <Badge
+                          variant={isExpired ? "destructive" : isExpiringSoon ? "outline" : "secondary"}
+                          className={isExpiringSoon && !isExpired ? "border-orange-500 text-orange-500" : ""}
+                        >
+                          {isExpired
+                            ? t("expiration.expired")
+                            : daysLeft === 0
+                            ? t("expiration.today")
+                            : `${daysLeft} ${t("expiration.days")}`}
+                        </Badge>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
                     </td>
+                    <td className="px-4 py-3 text-center hidden sm:table-cell">{item.quantity}</td>
                     <td className="px-4 py-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteItem(item.id);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingItem(item);
+                          }}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteItem(item.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -621,6 +648,14 @@ export default function InventoryPage() {
         confirmText={t("confirm.delete")}
         variant="destructive"
       />
+
+      {lightboxItem && (
+        <ItemLightbox
+          open={!!lightboxItem}
+          onOpenChange={(open) => !open && setLightboxItem(null)}
+          item={lightboxItem}
+        />
+      )}
     </div>
   );
 }

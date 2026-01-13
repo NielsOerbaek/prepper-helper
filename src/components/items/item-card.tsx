@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExpirationBadge } from "./expiration-badge";
+import { ItemLightbox } from "./item-lightbox";
 import { Category } from "@prisma/client";
 import { Pencil, Trash2, Camera, ImageIcon } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
@@ -25,6 +26,7 @@ interface ItemCardProps {
     category: Category;
     quantity: number;
     expirationDate: Date | null;
+    createdAt: Date;
     photos: Photo[];
   };
   onEdit?: (id: string) => void;
@@ -35,32 +37,38 @@ interface ItemCardProps {
 export function ItemCard({ item, onEdit, onDelete, onAddPhoto }: ItemCardProps) {
   const { t } = useLanguage();
   const [imageError, setImageError] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false);
   const firstPhoto = item.photos[0];
   const photoUrl = firstPhoto ? `/api/photos/${firstPhoto.id}` : null;
 
   return (
-    <Card className="overflow-hidden">
-      <div className="relative aspect-video bg-muted">
-        {photoUrl && !imageError ? (
-          <Image
-            src={photoUrl}
-            alt={item.name}
-            fill
-            className="object-cover"
-            unoptimized
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <ImageIcon className="h-12 w-12 text-muted-foreground" />
-          </div>
-        )}
-        {item.photos.length > 1 && (
-          <Badge className="absolute top-2 right-2" variant="secondary">
-            +{item.photos.length - 1} {t("item.morePhotos")}
-          </Badge>
-        )}
-      </div>
+    <>
+      <Card className="overflow-hidden">
+        <button
+          className="relative aspect-video bg-muted w-full cursor-pointer hover:opacity-90 transition-opacity"
+          onClick={() => item.photos.length > 0 && setShowLightbox(true)}
+          disabled={item.photos.length === 0}
+        >
+          {photoUrl && !imageError ? (
+            <Image
+              src={photoUrl}
+              alt={item.name}
+              fill
+              className="object-cover"
+              unoptimized
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <ImageIcon className="h-12 w-12 text-muted-foreground" />
+            </div>
+          )}
+          {item.photos.length > 1 && (
+            <Badge className="absolute top-2 right-2" variant="secondary">
+              +{item.photos.length - 1} {t("item.morePhotos")}
+            </Badge>
+          )}
+        </button>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-lg line-clamp-1" title={item.name}>{item.name}</CardTitle>
@@ -103,5 +111,11 @@ export function ItemCard({ item, onEdit, onDelete, onAddPhoto }: ItemCardProps) 
         </Button>
       </CardFooter>
     </Card>
+      <ItemLightbox
+        open={showLightbox}
+        onOpenChange={setShowLightbox}
+        item={item}
+      />
+    </>
   );
 }

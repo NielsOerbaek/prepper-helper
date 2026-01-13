@@ -231,8 +231,8 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
           {/* Main capture area or thumbnails */}
           {isCapturing ? (
             // Full camera view when capturing
-            <div className="space-y-4">
-              <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
+            <div className="space-y-3">
+              <div className="relative aspect-[4/3] bg-black rounded-lg overflow-hidden">
                 <video
                   ref={videoRef}
                   autoPlay
@@ -241,39 +241,73 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
                   className="w-full h-full object-cover"
                 />
                 {/* Overlay showing which slot we're capturing */}
-                <div className="absolute top-2 left-2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                <div className="absolute top-3 left-3 bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-medium">
                   {activeSlot === "front" ? t("camera.frontLabel") : t("camera.expirationLabel")}
-                  {activeSlot === "expiration" && <span className="text-xs ml-1">({t("camera.optional")})</span>}
+                  {activeSlot === "expiration" && <span className="text-xs ml-1 opacity-75">({t("camera.optional")})</span>}
+                </div>
+
+                {/* Large capture button overlaid on camera */}
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+                  <button
+                    onClick={capturePhoto}
+                    className="w-20 h-20 rounded-full bg-white border-4 border-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-white border-4 border-gray-300" />
+                  </button>
+                </div>
+
+                {/* Secondary actions */}
+                <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
+                  >
+                    <Upload className="h-5 w-5" />
+                  </button>
+                  {activeSlot === "expiration" && (
+                    <button
+                      onClick={skipExpiration}
+                      className="w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors text-xs font-medium"
+                    >
+                      {t("camera.skip")}
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* Thumbnails below camera */}
-              <div className="grid grid-cols-2 gap-2">
-                <div className={`relative aspect-video rounded border-2 ${frontImage ? "border-green-500" : "border-dashed border-muted-foreground/30"} overflow-hidden`}>
+              <div className="grid grid-cols-2 gap-3">
+                <div
+                  className={`relative aspect-video rounded-lg overflow-hidden ${frontImage ? "ring-2 ring-green-500" : "border-2 border-dashed border-muted-foreground/30 bg-muted"}`}
+                  onClick={() => frontImage && retakeSlot("front")}
+                >
                   {frontImage ? (
-                    <img src={frontImage} alt="" className="w-full h-full object-cover" />
+                    <>
+                      <img src={frontImage} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
+                        <Check className="h-3 w-3 text-white" />
+                      </div>
+                    </>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <div className="w-full h-full flex items-center justify-center">
                       <span className="text-xs text-muted-foreground">{t("camera.frontLabel")}</span>
                     </div>
                   )}
-                  {frontImage && (
-                    <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
-                      <Check className="h-3 w-3 text-white" />
-                    </div>
-                  )}
                 </div>
-                <div className={`relative aspect-video rounded border-2 ${expirationImage ? "border-green-500" : "border-dashed border-muted-foreground/30"} overflow-hidden`}>
+                <div
+                  className={`relative aspect-video rounded-lg overflow-hidden ${expirationImage ? "ring-2 ring-green-500" : "border-2 border-dashed border-muted-foreground/30 bg-muted"}`}
+                  onClick={() => expirationImage && retakeSlot("expiration")}
+                >
                   {expirationImage ? (
-                    <img src={expirationImage} alt="" className="w-full h-full object-cover" />
+                    <>
+                      <img src={expirationImage} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
+                        <Check className="h-3 w-3 text-white" />
+                      </div>
+                    </>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <div className="w-full h-full flex items-center justify-center">
                       <span className="text-xs text-muted-foreground">{t("camera.expirationLabel")}</span>
-                    </div>
-                  )}
-                  {expirationImage && (
-                    <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
-                      <Check className="h-3 w-3 text-white" />
                     </div>
                   )}
                 </div>
@@ -370,39 +404,19 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
 
           <DialogFooter className="flex flex-col gap-2">
             {isCapturing ? (
-              // Capturing mode - main snap button + secondary options
-              <>
-                <div className="flex w-full justify-center">
-                  <Button onClick={capturePhoto} size="lg" className="px-8">
-                    <Camera className="mr-2 h-5 w-5" />
-                    {t("camera.snap")}
+              // Capturing mode - simplified footer
+              <div className="flex w-full justify-between items-center">
+                {onAddManually && (
+                  <Button variant="ghost" size="sm" onClick={onAddManually}>
+                    <PenLine className="mr-1 h-4 w-4" />
+                    {t("camera.addManually")}
                   </Button>
-                </div>
-                <div className="flex w-full justify-between items-center">
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}>
-                      <Upload className="mr-1 h-4 w-4" />
-                      {t("camera.upload")}
-                    </Button>
-                    {onAddManually && (
-                      <Button variant="ghost" size="sm" onClick={onAddManually}>
-                        <PenLine className="mr-1 h-4 w-4" />
-                        {t("camera.addManually")}
-                      </Button>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    {activeSlot === "expiration" && (
-                      <Button variant="ghost" size="sm" onClick={skipExpiration}>
-                        {t("camera.skip")}
-                      </Button>
-                    )}
-                    <Button variant="outline" size="sm" onClick={handleClose}>
-                      {t("common.cancel")}
-                    </Button>
-                  </div>
-                </div>
-              </>
+                )}
+                <div className="flex-1" />
+                <Button variant="outline" size="sm" onClick={handleClose}>
+                  {t("common.cancel")}
+                </Button>
+              </div>
             ) : frontImage ? (
               // Review mode
               <>

@@ -384,6 +384,14 @@ export const translations = {
     da: "mere",
     en: "more",
   },
+  "item.addedOn": {
+    da: "Tilføjet",
+    en: "Added on",
+  },
+  "item.noImage": {
+    da: "Intet billede",
+    en: "No image",
+  },
   "item.save": {
     da: "Gem",
     en: "Save",
