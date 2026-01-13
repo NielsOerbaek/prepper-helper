@@ -51,7 +51,12 @@ export async function POST(request: NextRequest) {
         include: { item: true },
       });
 
-      if (photo && photo.item.userId === session.user.id) {
+      // Verify user is a member of the item's stash
+      const isMember = photo ? await prisma.stashMember.findUnique({
+        where: { stashId_userId: { stashId: photo.item.stashId, userId: session.user.id } },
+      }) : null;
+
+      if (photo && isMember) {
         await prisma.photo.update({
           where: { id: photoId },
           data: { aiAnalysis: analysis as unknown as Prisma.InputJsonValue },
