@@ -545,14 +545,15 @@ export default function StashPage() {
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder={t("stash.emailPlaceholder")}
+                autoFocus
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowInviteDialog(false)}>
+            <Button type="button" variant="outline" onClick={() => setShowInviteDialog(false)}>
               {t("common.cancel")}
             </Button>
-            <Button onClick={handleInvite} disabled={!inviteEmail.trim() || isInviting}>
+            <Button type="button" onClick={handleInvite} disabled={!inviteEmail.trim() || isInviting}>
               {isInviting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {t("common.invite")}
             </Button>

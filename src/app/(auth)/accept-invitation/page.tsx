@@ -216,6 +216,7 @@ function AcceptInvitationContent() {
         </CardContent>
         <CardFooter className="flex gap-3 justify-center">
           <Button
+            type="button"
             variant="outline"
             onClick={() => handleAction("decline")}
             disabled={processing}
@@ -223,6 +224,7 @@ function AcceptInvitationContent() {
             {t("common.decline")}
           </Button>
           <Button
+            type="button"
             onClick={() => handleAction("accept")}
             disabled={processing}
           >
