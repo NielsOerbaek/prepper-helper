@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useStash, Stash } from "@/lib/stash-context";
 import { useLanguage } from "@/lib/language-context";
+import { getRoleKey } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 
 export function StashSwitcher() {
@@ -99,7 +100,7 @@ export function StashSwitcher() {
                   <Users className="h-3 w-3" />
                   {stash.memberCount}
                   {stash.role !== "MEMBER" && (
-                    <span className="ml-1">({t(`stash.role.${stash.role.toLowerCase()}`)})</span>
+                    <span className="ml-1">({t(getRoleKey(stash.role))})</span>
                   )}
                 </span>
               </div>

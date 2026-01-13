@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useStash } from "@/lib/stash-context";
 import { useLanguage } from "@/lib/language-context";
+import { getRoleKey } from "@/lib/translations";
 import { toast } from "sonner";
 import { Loader2, Users, Mail, Trash2, MoreVertical, UserMinus, Shield, Check, X, Edit2 } from "lucide-react";
 
@@ -399,7 +400,7 @@ export default function StashPage() {
                 </>
               )}
             </div>
-            <Badge variant="secondary">{t(`stash.role.${stashDetails.role.toLowerCase()}`)}</Badge>
+            <Badge variant="secondary">{t(getRoleKey(stashDetails.role))}</Badge>
           </div>
           <CardDescription>
             {stashDetails.itemCount} {t("stash.itemCount")}
@@ -473,7 +474,7 @@ export default function StashPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant={member.role === "OWNER" ? "default" : "secondary"}>
-                  {t(`stash.role.${member.role.toLowerCase()}`)}
+                  {t(getRoleKey(member.role))}
                 </Badge>
                 {isOwner && member.userId !== session?.user?.id && (
                   <DropdownMenu>

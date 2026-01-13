@@ -1340,3 +1340,13 @@ export type CategoryKey =
 export function getCategoryKey(category: string): CategoryKey {
   return `category.${category}` as CategoryKey;
 }
+
+// Type-safe stash role key helper
+export type RoleKey =
+  | "stash.role.owner"
+  | "stash.role.admin"
+  | "stash.role.member";
+
+export function getRoleKey(role: string): RoleKey {
+  return `stash.role.${role.toLowerCase()}` as RoleKey;
+}
