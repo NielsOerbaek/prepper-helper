@@ -195,9 +195,11 @@
     border-width: 2px;
   }
 
-  /* Hover effect - translate shadow */
-  [data-slot="button"]:hover:not(:disabled) {
-    transform: translate(-2px, -2px);
+  /* Hover effect - translate shadow (only on devices with true hover support) */
+  @media (hover: hover) and (pointer: fine) {
+    [data-slot="button"]:hover:not(:disabled) {
+      transform: translate(-2px, -2px);
+    }
   }
 
   [data-slot="button"]:active:not(:disabled) {
