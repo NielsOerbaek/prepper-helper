@@ -954,14 +954,6 @@ export const translations = {
     da: "Antal skal være mindst 1",
     en: "Quantity must be at least 1",
   },
-  "item.addPhoto": {
-    da: "Foto",
-    en: "Photo",
-  },
-  "item.morePhotos": {
-    da: "mere",
-    en: "more",
-  },
 
   // Expiration badge
   "expiration.ok": {
