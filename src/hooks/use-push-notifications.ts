@@ -41,7 +41,7 @@ export function usePushNotifications() {
         let isSubscribed = false;
 
         // Check if already subscribed
-        const registration = await navigator.serviceWorker.getRegistration("/sw.js");
+        const registration = await navigator.serviceWorker.getRegistration("/push-sw.js");
         if (registration) {
           const subscription = await registration.pushManager.getSubscription();
           isSubscribed = !!subscription;
@@ -85,7 +85,7 @@ export function usePushNotifications() {
       }
 
       // Register service worker
-      const registration = await navigator.serviceWorker.register("/sw.js");
+      const registration = await navigator.serviceWorker.register("/push-sw.js");
       await navigator.serviceWorker.ready;
 
       // Get VAPID public key
@@ -142,7 +142,7 @@ export function usePushNotifications() {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const registration = await navigator.serviceWorker.getRegistration("/sw.js");
+      const registration = await navigator.serviceWorker.getRegistration("/push-sw.js");
       if (registration) {
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) {
