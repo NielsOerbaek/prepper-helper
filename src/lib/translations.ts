@@ -316,6 +316,10 @@ export const translations = {
     da: "Tilføj foto",
     en: "Add Photo",
   },
+  "item.morePhotos": {
+    da: "mere",
+    en: "more",
+  },
   "item.save": {
     da: "Gem",
     en: "Save",
