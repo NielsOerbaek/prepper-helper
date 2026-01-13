@@ -8,16 +8,29 @@ datasource db {
 }
 
 model User {
-  id               String        @id @default(cuid())
-  email            String?       @unique
-  passwordHash     String?
-  promiseId        String?       @unique
-  name             String?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  sessions         Session[]
-  accounts         Account[]
-  stashMemberships StashMember[]
+  id                String             @id @default(cuid())
+  email             String?            @unique
+  passwordHash      String?
+  promiseId         String?            @unique
+  name              String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  sessions          Session[]
+  accounts          Account[]
+  stashMemberships  StashMember[]
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Stash {

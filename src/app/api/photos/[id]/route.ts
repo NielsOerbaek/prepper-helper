@@ -4,6 +4,12 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { deleteObject, minioClient, BUCKET_NAME } from "@/lib/minio";
 
+async function verifyStashMembership(stashId: string, userId: string) {
+  return prisma.stashMember.findUnique({
+    where: { stashId_userId: { stashId, userId } },
+  });
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -25,7 +31,9 @@ export async function GET(
       return NextResponse.json({ error: "Photo not found" }, { status: 404 });
     }
 
-    if (photo.item.userId !== session.user.id) {
+    // Verify user is a member of the item's stash
+    const isMember = await verifyStashMembership(photo.item.stashId, session.user.id);
+    if (!isMember) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -75,7 +83,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Photo not found" }, { status: 404 });
     }
 
-    if (photo.item.userId !== session.user.id) {
+    // Verify user is a member of the item's stash
+    const isMember = await verifyStashMembership(photo.item.stashId, session.user.id);
+    if (!isMember) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

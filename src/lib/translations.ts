@@ -714,6 +714,26 @@ export const translations = {
     da: "Advarselsgrænse (dage før udløb)",
     en: "Alert Threshold (days before expiration)",
   },
+  "settings.testNotification": {
+    da: "Test notifikation",
+    en: "Test Notification",
+  },
+  "settings.testNotificationDescription": {
+    da: "Send en test notifikation med dit nærmeste udløbende produkt",
+    en: "Send a test notification with your closest expiring item",
+  },
+  "settings.sendTest": {
+    da: "Send test",
+    en: "Send Test",
+  },
+  "settings.testNotificationSent": {
+    da: "Test notifikation sendt!",
+    en: "Test notification sent!",
+  },
+  "settings.testNotificationFailed": {
+    da: "Kunne ikke sende test notifikation",
+    en: "Failed to send test notification",
+  },
   "settings.security": {
     da: "Sikkerhed",
     en: "Security",

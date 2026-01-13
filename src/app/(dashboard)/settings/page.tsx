@@ -1,40 +1,61 @@
 "use client";
 
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { useNotifications } from "@/hooks/use-notifications";
-import { User, Bell, Shield, Info, BellOff, BellRing } from "lucide-react";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { User, Bell, Shield, Info, BellOff, BellRing, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/language-context";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
   const { data: session } = useSession();
+  const [isSendingTest, setIsSendingTest] = useState(false);
   const {
-    settings,
-    permission,
     isSupported,
-    updateSettings,
-    enableNotifications,
-    disableNotifications,
-  } = useNotifications();
+    isSubscribed,
+    isLoading,
+    permission,
+    error,
+    subscribe,
+    unsubscribe,
+    sendTestNotification,
+  } = usePushNotifications();
 
   const handleEnableNotifications = async () => {
-    const success = await enableNotifications();
+    const success = await subscribe();
     if (success) {
       toast.success(t("toast.notificationsEnabled"));
+    } else if (error) {
+      toast.error(error);
     } else {
       toast.error(t("toast.notificationsFailed"));
     }
   };
 
-  const handleDisableNotifications = () => {
-    disableNotifications();
-    toast.info(t("toast.notificationsDisabled"));
+  const handleDisableNotifications = async () => {
+    const success = await unsubscribe();
+    if (success) {
+      toast.info(t("toast.notificationsDisabled"));
+    }
+  };
+
+  const handleTestNotification = async () => {
+    setIsSendingTest(true);
+    try {
+      const success = await sendTestNotification();
+      if (success) {
+        toast.success(t("settings.testNotificationSent"));
+      } else {
+        toast.error(t("settings.testNotificationFailed"));
+      }
+    } finally {
+      setIsSendingTest(false);
+    }
   };
 
   return (
@@ -97,18 +118,27 @@ export default function SettingsPage() {
                       {t("settings.pushDescription")}
                     </p>
                   </div>
-                  {settings.enabled ? (
+                  {isSubscribed ? (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={handleDisableNotifications}
+                      disabled={isLoading}
                     >
-                      <BellOff className="mr-2 h-4 w-4" />
+                      {isLoading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <BellOff className="mr-2 h-4 w-4" />
+                      )}
                       {t("settings.disable")}
                     </Button>
                   ) : (
-                    <Button size="sm" onClick={handleEnableNotifications}>
-                      <BellRing className="mr-2 h-4 w-4" />
+                    <Button size="sm" onClick={handleEnableNotifications} disabled={isLoading}>
+                      {isLoading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <BellRing className="mr-2 h-4 w-4" />
+                      )}
                       {t("settings.enable")}
                     </Button>
                   )}
@@ -120,45 +150,28 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {settings.enabled && (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>{t("settings.expirationAlerts")}</Label>
-                        <p className="text-sm text-muted-foreground">
-                          {t("settings.expirationAlertsDescription")}
-                        </p>
-                      </div>
-                      <Switch
-                        checked={settings.expirationAlerts}
-                        onCheckedChange={(checked) =>
-                          updateSettings({ expirationAlerts: checked })
-                        }
-                      />
+                {isSubscribed && (
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <div className="space-y-0.5">
+                      <Label>{t("settings.testNotification")}</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {t("settings.testNotificationDescription")}
+                      </p>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label>{t("settings.alertThreshold")}</Label>
-                      <div className="flex items-center gap-4">
-                        {[3, 7, 14, 30].map((days) => (
-                          <Button
-                            key={days}
-                            variant={
-                              settings.daysBeforeExpiration === days
-                                ? "default"
-                                : "outline"
-                            }
-                            size="sm"
-                            onClick={() =>
-                              updateSettings({ daysBeforeExpiration: days })
-                            }
-                          >
-                            {days}d
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleTestNotification}
+                      disabled={isSendingTest}
+                    >
+                      {isSendingTest ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="mr-2 h-4 w-4" />
+                      )}
+                      {t("settings.sendTest")}
+                    </Button>
+                  </div>
                 )}
               </>
             )}
