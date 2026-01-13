@@ -1,0 +1,95 @@
+"use client";
+
+import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { CATEGORY_LABELS } from "@/types";
+import { Category } from "@prisma/client";
+import { Trash2, Link2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface ChecklistItemProps {
+  item: {
+    id: string;
+    name: string;
+    category: Category;
+    isChecked: boolean;
+    isDefault: boolean;
+    linkedItemId: string | null;
+  };
+  onToggle: (id: string, checked: boolean) => void;
+  onDelete?: (id: string) => void;
+  onLink?: (id: string) => void;
+}
+
+export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistItemProps) {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleToggle = async () => {
+    setIsUpdating(true);
+    try {
+      await onToggle(item.id, !item.isChecked);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-3 p-3 rounded-lg border transition-colors",
+        item.isChecked ? "bg-muted/50" : "bg-background"
+      )}
+    >
+      <Checkbox
+        checked={item.isChecked}
+        onCheckedChange={handleToggle}
+        disabled={isUpdating}
+        className="h-5 w-5"
+      />
+      <div className="flex-1 min-w-0">
+        <p
+          className={cn(
+            "font-medium truncate",
+            item.isChecked && "line-through text-muted-foreground"
+          )}
+        >
+          {item.name}
+        </p>
+      </div>
+      <Badge variant="outline" className="shrink-0">
+        {CATEGORY_LABELS[item.category]}
+      </Badge>
+      {item.linkedItemId && (
+        <Badge variant="secondary" className="shrink-0">
+          <Link2 className="h-3 w-3 mr-1" />
+          Linked
+        </Badge>
+      )}
+      <div className="flex gap-1 shrink-0">
+        {onLink && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onLink(item.id)}
+            title="Link to inventory item"
+          >
+            <Link2 className="h-4 w-4" />
+          </Button>
+        )}
+        {!item.isDefault && onDelete && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive"
+            onClick={() => onDelete(item.id)}
+            title="Delete item"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
