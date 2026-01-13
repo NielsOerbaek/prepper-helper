@@ -5,6 +5,12 @@ import { authOptions } from "@/lib/auth";
 import { minioClient, BUCKET_NAME, ensureBucket } from "@/lib/minio";
 import { randomUUID } from "crypto";
 
+async function verifyStashMembership(stashId: string, userId: string) {
+  return prisma.stashMember.findUnique({
+    where: { stashId_userId: { stashId, userId } },
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,7 +29,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify item ownership
+    // Verify item exists and user has access
     const item = await prisma.item.findUnique({
       where: { id: itemId },
     });
@@ -32,13 +38,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
 
-    if (item.userId !== session.user.id) {
+    // Verify user is a member of the item's stash
+    const isMember = await verifyStashMembership(item.stashId, session.user.id);
+    if (!isMember) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Generate unique key for MinIO
     const extension = file.name.split(".").pop() || "jpg";
-    const minioKey = `${session.user.id}/${itemId}/${randomUUID()}.${extension}`;
+    const minioKey = `${item.stashId}/${itemId}/${randomUUID()}.${extension}`;
 
     // Ensure bucket exists
     await ensureBucket();
