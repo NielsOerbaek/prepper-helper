@@ -4,42 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/language-context";
-import { TranslationKey } from "@/lib/translations";
-import { Package, ClipboardList, Clock, Settings, Home, LucideIcon } from "lucide-react";
-
-interface NavItem {
-  titleKey: TranslationKey;
-  href: string;
-  icon: LucideIcon;
-}
-
-const navItems: NavItem[] = [
-  {
-    titleKey: "nav.dashboard",
-    href: "/",
-    icon: Home,
-  },
-  {
-    titleKey: "nav.inventory",
-    href: "/inventory",
-    icon: Package,
-  },
-  {
-    titleKey: "nav.checklist",
-    href: "/checklist",
-    icon: ClipboardList,
-  },
-  {
-    titleKey: "nav.expiringSoon",
-    href: "/expiring",
-    icon: Clock,
-  },
-  {
-    titleKey: "nav.settings",
-    href: "/settings",
-    icon: Settings,
-  },
-];
+import { navItems } from "@/lib/nav-config";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -54,7 +19,7 @@ export function Sidebar() {
             href={item.href}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              pathname === item.href
+              pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}

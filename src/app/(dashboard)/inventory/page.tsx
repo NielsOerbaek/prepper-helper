@@ -10,7 +10,7 @@ import { CameraCapture } from "@/components/photos/camera-capture";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CATEGORY_LABELS } from "@/types";
 import { Category } from "@prisma/client";
-import { Plus, Search, Filter, Loader2 } from "lucide-react";
+import { Plus, Search, Filter, Loader2, LayoutGrid, List, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/language-context";
 import { useStash } from "@/lib/stash-context";
@@ -53,6 +53,12 @@ export default function InventoryPage() {
     expirationBase64?: string;
   } | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("inventoryViewMode") as "grid" | "list") || "grid";
+    }
+    return "grid";
+  });
 
   const fetchItems = useCallback(async () => {
     if (!currentStash) {
@@ -235,6 +241,11 @@ export default function InventoryPage() {
     setShowCamera(true);
   };
 
+  const handleViewModeChange = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    localStorage.setItem("inventoryViewMode", mode);
+  };
+
   const handleScanCapture = async (
     file: File,
     base64: string,
@@ -373,12 +384,34 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between w-full">
         <h1 className="text-3xl font-bold">{t("inventory.title")}</h1>
-        <Button variant="outline" onClick={() => setShowScanner(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t("inventory.addItem")}
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex border rounded-md">
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => handleViewModeChange("grid")}
+              title={t("inventory.viewGrid")}
+              className="rounded-r-none"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => handleViewModeChange("list")}
+              title={t("inventory.viewList")}
+              className="rounded-l-none"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
+          <Button variant="outline" onClick={() => setShowScanner(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t("inventory.addItem")}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
@@ -428,7 +461,7 @@ export default function InventoryPage() {
             </Button>
           )}
         </div>
-      ) : (
+      ) : viewMode === "grid" ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => (
             <ItemCard
@@ -442,6 +475,67 @@ export default function InventoryPage() {
               onAddPhoto={openCameraForItem}
             />
           ))}
+        </div>
+      ) : (
+        <div className="border rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left px-4 py-3 font-medium">{t("item.name")}</th>
+                <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">{t("item.category")}</th>
+                <th className="text-center px-4 py-3 font-medium">{t("item.quantity")}</th>
+                <th className="text-left px-4 py-3 font-medium hidden md:table-cell">{t("item.expirationDate")}</th>
+                <th className="px-4 py-3 w-10"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {items.map((item) => {
+                const isExpiringSoon = item.expirationDate &&
+                  new Date(item.expirationDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                const isExpired = item.expirationDate && new Date(item.expirationDate) < new Date();
+                return (
+                  <tr
+                    key={item.id}
+                    className="hover:bg-muted/30 cursor-pointer"
+                    onClick={() => {
+                      const itemToEdit = items.find((i) => i.id === item.id);
+                      if (itemToEdit) setEditingItem(itemToEdit);
+                    }}
+                  >
+                    <td className="px-4 py-3">
+                      <span className="font-medium" title={item.name}>{item.name}</span>
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <span className="text-muted-foreground">{t(getCategoryKey(item.category))}</span>
+                    </td>
+                    <td className="px-4 py-3 text-center">{item.quantity}</td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      {item.expirationDate ? (
+                        <span className={isExpired ? "text-destructive" : isExpiringSoon ? "text-orange-500" : ""}>
+                          {new Date(item.expirationDate).toLocaleDateString(language)}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteItem(item.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 

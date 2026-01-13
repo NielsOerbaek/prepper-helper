@@ -4,10 +4,11 @@ import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORY_LABELS } from "@/types";
 import { Category } from "@prisma/client";
 import { Trash2, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/language-context";
+import { getCategoryKey, TranslationKey } from "@/lib/translations";
 
 interface ChecklistItemProps {
   item: {
@@ -24,6 +25,7 @@ interface ChecklistItemProps {
 }
 
 export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistItemProps) {
+  const { t } = useLanguage();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleToggle = async () => {
@@ -34,6 +36,11 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
       setIsUpdating(false);
     }
   };
+
+  // Translate item names that are translation keys (e.g., "checklist.item.xxx")
+  const displayName = item.name.startsWith("checklist.item.")
+    ? t(item.name as TranslationKey)
+    : item.name;
 
   return (
     <div
@@ -55,11 +62,11 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
             item.isChecked && "line-through text-muted-foreground"
           )}
         >
-          {item.name}
+          {displayName}
         </p>
       </div>
       <Badge variant="outline" className="shrink-0">
-        {CATEGORY_LABELS[item.category]}
+        {t(getCategoryKey(item.category))}
       </Badge>
       {item.linkedItemId && (
         <Badge variant="secondary" className="shrink-0">

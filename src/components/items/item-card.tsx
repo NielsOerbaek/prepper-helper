@@ -62,9 +62,9 @@ export function ItemCard({ item, onEdit, onDelete, onAddPhoto }: ItemCardProps) 
         )}
       </div>
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg line-clamp-1">{item.name}</CardTitle>
-          <Badge variant="outline">{t(getCategoryKey(item.category))}</Badge>
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="text-lg line-clamp-1" title={item.name}>{item.name}</CardTitle>
+          <Badge variant="outline" className="shrink-0">{t(getCategoryKey(item.category))}</Badge>
         </div>
       </CardHeader>
       <CardContent className="pb-2">

@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, Settings } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { LanguageSwitcher } from "./language-switcher";
 import { StashSwitcher } from "./stash-switcher";
 import { useLanguage } from "@/lib/language-context";
@@ -31,7 +31,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 items-center px-4">
+      <div className="flex h-14 items-center px-4 w-full">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <Image
             src="/icon.png"
@@ -48,27 +48,6 @@ export function Header() {
             <StashSwitcher />
           </div>
         )}
-
-        <nav className="hidden md:flex ml-6 gap-4">
-          <Link
-            href="/inventory"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {t("nav.inventory")}
-          </Link>
-          <Link
-            href="/checklist"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {t("nav.checklist")}
-          </Link>
-          <Link
-            href="/expiring"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {t("nav.expiringSoon")}
-          </Link>
-        </nav>
 
         <div className="flex-1" />
 
@@ -96,13 +75,6 @@ export function Header() {
                   )}
                 </div>
               </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
-                  {t("nav.settings")}
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer"

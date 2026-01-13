@@ -346,6 +346,14 @@ export const translations = {
     da: "Er du sikker på at du vil slette denne vare?",
     en: "Are you sure you want to delete this item?",
   },
+  "inventory.viewGrid": {
+    da: "Gittervisning",
+    en: "Grid view",
+  },
+  "inventory.viewList": {
+    da: "Listevisning",
+    en: "List view",
+  },
 
   // Item form
   "item.name": {
@@ -830,6 +838,62 @@ export const translations = {
     da: "Lagring",
     en: "Storage",
   },
+  "settings.viewAbout": {
+    da: "Se om-side",
+    en: "View about page",
+  },
+  "about.title": {
+    da: "Om Prepper Helper",
+    en: "About Prepper Helper",
+  },
+  "about.description": {
+    da: "Din intelligente assistent til nødberedskab",
+    en: "Your intelligent emergency preparedness assistant",
+  },
+  "about.whatIs": {
+    da: "Hvad er Prepper Helper?",
+    en: "What is Prepper Helper?",
+  },
+  "about.whatIsDescription": {
+    da: "Prepper Helper er en app designet til at hjælpe dig med at organisere og holde styr på dine nødforsyninger. Med AI-drevet billedgenkendelse kan du nemt scanne og katalogisere dine varer, holde øje med udløbsdatoer og sikre at du altid er forberedt.",
+    en: "Prepper Helper is an app designed to help you organize and track your emergency supplies. With AI-powered image recognition, you can easily scan and catalog your items, monitor expiration dates, and ensure you're always prepared.",
+  },
+  "about.features": {
+    da: "Funktioner",
+    en: "Features",
+  },
+  "about.featureScanning": {
+    da: "AI-drevet scanning af varer",
+    en: "AI-powered item scanning",
+  },
+  "about.featureExpiration": {
+    da: "Udløbsdato-tracking med notifikationer",
+    en: "Expiration date tracking with notifications",
+  },
+  "about.featureChecklist": {
+    da: "Tjekliste til nødberedskab",
+    en: "Emergency preparedness checklist",
+  },
+  "about.featureMultiStash": {
+    da: "Flere lagre/lokationer",
+    en: "Multiple stashes/locations",
+  },
+  "about.featureMultiLang": {
+    da: "Flersproget support",
+    en: "Multi-language support",
+  },
+  "about.techStack": {
+    da: "Teknologi",
+    en: "Technology",
+  },
+  "about.builtWith": {
+    da: "Bygget med",
+    en: "Built with",
+  },
+  "about.backToSettings": {
+    da: "Tilbage til indstillinger",
+    en: "Back to settings",
+  },
   "settings.language": {
     da: "Sprog",
     en: "Language",
@@ -1162,6 +1226,22 @@ export const translations = {
     da: "Promise Auth",
     en: "Promise Auth",
   },
+  "settings.editName": {
+    da: "Rediger navn",
+    en: "Edit Name",
+  },
+  "settings.editNameDescription": {
+    da: "Opdater dit visningsnavn",
+    en: "Update your display name",
+  },
+  "settings.nameRequired": {
+    da: "Navn er påkrævet",
+    en: "Name is required",
+  },
+  "settings.nameUpdated": {
+    da: "Navn opdateret",
+    en: "Name updated",
+  },
 
   // Confirm dialogs
   "confirm.deleteItem": {
@@ -1393,6 +1473,120 @@ export const translations = {
   "stash.itemCount": {
     da: "varer",
     en: "items",
+  },
+
+  // Default checklist items
+  "checklist.item.bottledWater": {
+    da: "Flaskevand (1 gallon per person per dag)",
+    en: "Bottled Water (1 gallon per person per day)",
+  },
+  "checklist.item.waterPurification": {
+    da: "Vandrensende tabletter",
+    en: "Water Purification Tablets",
+  },
+  "checklist.item.cannedVegetables": {
+    da: "Grøntsager på dåse",
+    en: "Canned Vegetables",
+  },
+  "checklist.item.cannedFruits": {
+    da: "Frugt på dåse",
+    en: "Canned Fruits",
+  },
+  "checklist.item.cannedMeatFish": {
+    da: "Kød/fisk på dåse",
+    en: "Canned Meat/Fish",
+  },
+  "checklist.item.cannedSoup": {
+    da: "Dåsesuppe",
+    en: "Canned Soup",
+  },
+  "checklist.item.rice": {
+    da: "Ris",
+    en: "Rice",
+  },
+  "checklist.item.pasta": {
+    da: "Pasta",
+    en: "Pasta",
+  },
+  "checklist.item.oatmeal": {
+    da: "Havregryn",
+    en: "Oatmeal",
+  },
+  "checklist.item.crackers": {
+    da: "Knækbrød/kiks",
+    en: "Crackers",
+  },
+  "checklist.item.peanutButter": {
+    da: "Jordnøddesmør",
+    en: "Peanut Butter",
+  },
+  "checklist.item.driedBeans": {
+    da: "Tørrede bønner/linser",
+    en: "Dried Beans/Lentils",
+  },
+  "checklist.item.firstAidKit": {
+    da: "Førstehjælpskasse",
+    en: "First Aid Kit",
+  },
+  "checklist.item.prescriptionMeds": {
+    da: "Receptpligtig medicin",
+    en: "Prescription Medications",
+  },
+  "checklist.item.painRelievers": {
+    da: "Smertestillende",
+    en: "Pain Relievers",
+  },
+  "checklist.item.bandagesGauze": {
+    da: "Bandager og gazebind",
+    en: "Bandages and Gauze",
+  },
+  "checklist.item.antisepticWipes": {
+    da: "Antiseptiske servietter",
+    en: "Antiseptic Wipes",
+  },
+  "checklist.item.flashlight": {
+    da: "Lommelygte",
+    en: "Flashlight",
+  },
+  "checklist.item.batteries": {
+    da: "Batterier",
+    en: "Batteries",
+  },
+  "checklist.item.canOpener": {
+    da: "Manuel dåseåbner",
+    en: "Manual Can Opener",
+  },
+  "checklist.item.multitool": {
+    da: "Multiværktøj/kniv",
+    en: "Multi-tool/Knife",
+  },
+  "checklist.item.radio": {
+    da: "Radio (batteri eller håndsving)",
+    en: "Radio (battery or hand-crank)",
+  },
+  "checklist.item.toiletPaper": {
+    da: "Toiletpapir",
+    en: "Toilet Paper",
+  },
+  "checklist.item.handSanitizer": {
+    da: "Håndsprit",
+    en: "Hand Sanitizer",
+  },
+  "checklist.item.soap": {
+    da: "Sæbe",
+    en: "Soap",
+  },
+  "checklist.item.toothbrushPaste": {
+    da: "Tandbørste og tandpasta",
+    en: "Toothbrush and Toothpaste",
+  },
+  "checklist.item.importantDocs": {
+    da: "Vigtige dokumenter (kopier)",
+    en: "Important Documents (copies)",
+  },
+  "checklist.item.cash": {
+    da: "Kontanter (små sedler)",
+    en: "Cash (small bills)",
   },
 } as const;
 

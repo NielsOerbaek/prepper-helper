@@ -76,7 +76,7 @@
 
   /* Primary - bold orange */
   --primary: hsl(25 95% 53%);
-  --primary-foreground: hsl(0 0% 0%);
+  --primary-foreground: hsl(0 0% 100%);
 
   /* Secondary - soft yellow */
   --secondary: hsl(48 96% 89%);
@@ -131,7 +131,7 @@
 
   /* Primary - bold orange */
   --primary: hsl(25 95% 53%);
-  --primary-foreground: hsl(0 0% 0%);
+  --primary-foreground: hsl(0 0% 100%);
 
   /* Secondary - dark surface */
   --secondary: hsl(240 4% 20%);

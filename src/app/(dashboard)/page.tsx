@@ -90,12 +90,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Prominent Scanner Button */}
-      <Card className="bg-primary text-primary-foreground">
+      <Card className="bg-gradient-to-br from-primary/20 via-primary/10 to-background border-primary/30">
         <CardContent className="flex flex-col items-center justify-center py-8">
-          <Camera className="h-16 w-16 mb-4" />
+          <div className="rounded-full bg-primary/15 p-4 mb-4">
+            <Camera className="h-10 w-10 text-primary" />
+          </div>
           <h2 className="text-2xl font-bold mb-2">{t("dashboard.scanAnItem")}</h2>
-          <p className="text-center mb-4 opacity-90">{t("dashboard.scanDescription")}</p>
-          <Button size="lg" variant="secondary" asChild>
+          <p className="text-center mb-4 text-muted-foreground">{t("dashboard.scanDescription")}</p>
+          <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
             <Link href="/scan">
               <Camera className="mr-2 h-5 w-5" />
               {t("dashboard.startScanner")}

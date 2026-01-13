@@ -6,15 +6,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
-import { User, Bell, Shield, Info, BellOff, BellRing, Send, Loader2 } from "lucide-react";
+import { User, Bell, Shield, BellOff, BellRing, Send, Loader2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/language-context";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const [isSendingTest, setIsSendingTest] = useState(false);
+  const [showEditName, setShowEditName] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [isUpdatingName, setIsUpdatingName] = useState(false);
   const {
     isSupported,
     isSubscribed,
@@ -25,6 +37,37 @@ export default function SettingsPage() {
     unsubscribe,
     sendTestNotification,
   } = usePushNotifications();
+
+  const handleEditName = () => {
+    setEditName(session?.user?.name || "");
+    setShowEditName(true);
+  };
+
+  const handleSaveName = async () => {
+    if (!editName.trim()) {
+      toast.error(t("settings.nameRequired"));
+      return;
+    }
+
+    setIsUpdatingName(true);
+    try {
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: editName.trim() }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update name");
+
+      await updateSession({ name: editName.trim() });
+      setShowEditName(false);
+      toast.success(t("settings.nameUpdated"));
+    } catch {
+      toast.error(t("toast.updateFailed"));
+    } finally {
+      setIsUpdatingName(false);
+    }
+  };
 
   const handleEnableNotifications = async () => {
     const success = await subscribe();
@@ -80,9 +123,14 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{t("settings.nameLabel")}</span>
-              <span className="text-sm text-muted-foreground">
-                {session?.user?.name || t("settings.notSet")}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  {session?.user?.name || t("settings.notSet")}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleEditName}>
+                  <Pencil className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{t("settings.userId")}</span>
@@ -200,31 +248,36 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Info className="h-5 w-5" />
-              {t("settings.about")}
-            </CardTitle>
-            <CardDescription>{t("settings.aboutDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{t("settings.version")}</span>
-              <span className="text-sm text-muted-foreground">1.0.0</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{t("settings.aiProvider")}</span>
-              <span className="text-sm text-muted-foreground">Anthropic Claude</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{t("settings.storage")}</span>
-              <span className="text-sm text-muted-foreground">MinIO (S3-compatible)</span>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      <Dialog open={showEditName} onOpenChange={setShowEditName}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("settings.editName")}</DialogTitle>
+            <DialogDescription>{t("settings.editNameDescription")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">{t("settings.nameLabel")}</Label>
+              <Input
+                id="name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder={t("auth.yourName")}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditName(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={handleSaveName} disabled={isUpdatingName}>
+              {isUpdatingName && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("common.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
