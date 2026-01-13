@@ -134,6 +134,62 @@ export const translations = {
     da: "Registrering lykkedes, men login fejlede. Prøv at logge ind igen.",
     en: "Registration successful, but login failed. Please try logging in.",
   },
+  "auth.forgotPassword": {
+    da: "Glemt adgangskode?",
+    en: "Forgot password?",
+  },
+  "auth.forgotPasswordDescription": {
+    da: "Indtast din email, så sender vi et link til at nulstille din adgangskode.",
+    en: "Enter your email and we'll send you a link to reset your password.",
+  },
+  "auth.sendResetLink": {
+    da: "Send nulstillingslink",
+    en: "Send Reset Link",
+  },
+  "auth.checkEmail": {
+    da: "Tjek din email",
+    en: "Check Your Email",
+  },
+  "auth.resetEmailSent": {
+    da: "Hvis der findes en konto med denne email, har vi sendt et link til at nulstille din adgangskode.",
+    en: "If an account exists with this email, we've sent a link to reset your password.",
+  },
+  "auth.backToLogin": {
+    da: "Tilbage til login",
+    en: "Back to login",
+  },
+  "auth.resetPassword": {
+    da: "Nulstil adgangskode",
+    en: "Reset Password",
+  },
+  "auth.resetPasswordDescription": {
+    da: "Indtast din nye adgangskode nedenfor.",
+    en: "Enter your new password below.",
+  },
+  "auth.newPassword": {
+    da: "Ny adgangskode",
+    en: "New Password",
+  },
+  "auth.passwordReset": {
+    da: "Adgangskode nulstillet!",
+    en: "Password Reset!",
+  },
+  "auth.passwordResetSuccess": {
+    da: "Din adgangskode er blevet nulstillet. Du bliver nu sendt til login-siden.",
+    en: "Your password has been reset. You will now be redirected to the login page.",
+  },
+  "auth.invalidToken": {
+    da: "Ugyldigt link",
+    en: "Invalid Link",
+  },
+  "auth.invalidTokenDescription": {
+    da: "Dette link er ugyldigt eller udløbet. Anmod venligst om et nyt nulstillingslink.",
+    en: "This link is invalid or has expired. Please request a new reset link.",
+  },
+  "auth.requestNewLink": {
+    da: "Anmod om nyt link",
+    en: "Request New Link",
+  },
 
   // Dashboard
   "dashboard.title": {

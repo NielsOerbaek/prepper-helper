@@ -20,8 +20,9 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Package, Shield } from "lucide-react";
+import { Loader2, Shield } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import Image from "next/image";
 
 const formSchema = z.object({
   email: z.string().email("Indtast venligst en gyldig email"),
@@ -85,9 +86,15 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Package className="h-12 w-12 text-primary" />
+            <Image
+              src="/icon.png"
+              alt={t("app.name")}
+              width={64}
+              height={64}
+              className="rounded-xl shadow-lg"
+            />
           </div>
-          <CardTitle className="text-2xl">{t("auth.welcomeBack")}</CardTitle>
+          <CardTitle className="text-2xl">{t("app.name")}</CardTitle>
           <CardDescription>{t("auth.signInDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -140,7 +147,12 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("auth.password")}</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>{t("auth.password")}</FormLabel>
+                      <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                        {t("auth.forgotPassword")}
+                      </Link>
+                    </div>
                     <FormControl>
                       <Input type="password" placeholder={t("auth.enterPassword")} {...field} />
                     </FormControl>

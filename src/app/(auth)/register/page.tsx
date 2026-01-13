@@ -20,8 +20,9 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Package, Shield } from "lucide-react";
+import { Loader2, Shield } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import Image from "next/image";
 
 const formSchema = z.object({
   name: z.string().min(2, "Navn skal være mindst 2 tegn"),
@@ -109,9 +110,15 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Package className="h-12 w-12 text-primary" />
+            <Image
+              src="/icon.png"
+              alt={t("app.name")}
+              width={64}
+              height={64}
+              className="rounded-xl shadow-lg"
+            />
           </div>
-          <CardTitle className="text-2xl">{t("auth.createAccount")}</CardTitle>
+          <CardTitle className="text-2xl">{t("app.name")}</CardTitle>
           <CardDescription>{t("auth.createAccountDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

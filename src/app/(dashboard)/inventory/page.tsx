@@ -27,7 +27,7 @@ interface Item {
 }
 
 export default function InventoryPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { currentStash, isLoading: stashLoading } = useStash();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -212,6 +212,7 @@ export default function InventoryPage() {
           photoId: photo.id,
           imageBase64: base64,
           mimeType: file.type,
+          language,
         }),
       });
 
@@ -252,6 +253,7 @@ export default function InventoryPage() {
           mimeType: file.type,
           expirationImageBase64: expirationBase64,
           expirationMimeType: expirationFile?.type,
+          language,
         }),
       });
 

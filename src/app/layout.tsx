@@ -9,21 +9,21 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Prepper Helper",
+  title: "Prepperhjælper",
   description: "AI-powered emergency supply inventory management",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Prepper Helper",
+    title: "Prepperhjælper",
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: "website",
-    siteName: "Prepper Helper",
-    title: "Prepper Helper",
+    siteName: "Prepperhjælper",
+    title: "Prepperhjælper",
     description: "AI-powered emergency supply inventory management",
   },
 };
@@ -44,8 +44,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/icons/icon-192.png" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="icon" href="/icon.png" />
+        <link rel="apple-touch-icon" href="/icon.png" />
       </head>
       <body
         className={`${spaceGrotesk.variable} font-sans antialiased`}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { FloatingNav } from "@/components/layout/floating-nav";
 import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -40,6 +41,7 @@ export default function DashboardLayout({
         <Sidebar />
         <main className="flex-1 p-4 md:p-6 overflow-auto">{children}</main>
       </div>
+      <FloatingNav />
     </div>
   );
 }

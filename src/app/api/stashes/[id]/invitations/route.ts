@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { resend, FROM_EMAIL } from "@/lib/resend";
+import { invitationEmail } from "@/lib/emails";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -70,7 +72,20 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { email, userId } = body;
+    const { email, userId, language = "en" } = body;
+
+    // Get stash and inviter details for the email
+    const stash = await prisma.stash.findUnique({
+      where: { id: stashId },
+    });
+
+    if (!stash) {
+      return NextResponse.json({ error: "Stash not found" }, { status: 404 });
+    }
+
+    const inviter = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
 
     if (!email && !userId) {
       return NextResponse.json(
@@ -136,6 +151,32 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         expiresAt,
       },
     });
+
+    // Send invitation email if we have an email address
+    const recipientEmail = email?.toLowerCase() || (targetUserId ? (await prisma.user.findUnique({ where: { id: targetUserId } }))?.email : null);
+
+    if (recipientEmail) {
+      try {
+        const emailContent = invitationEmail({
+          stashName: stash.name,
+          inviterName: inviter?.name || inviter?.email || "Someone",
+          inviterEmail: inviter?.email || "",
+          invitationId: invitation.id,
+          expiresAt,
+          language: language as "da" | "en",
+        });
+
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: recipientEmail,
+          subject: emailContent.subject,
+          html: emailContent.html,
+        });
+      } catch (emailError) {
+        console.error("Failed to send invitation email:", emailError);
+        // Don't fail the invitation creation if email fails
+      }
+    }
 
     return NextResponse.json(
       {

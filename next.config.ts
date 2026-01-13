@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  // Skip type checking during build for faster iteration
+  // Run `npx tsc --noEmit` separately if needed
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

@@ -63,7 +63,7 @@ interface UserInvitation {
 }
 
 export default function StashPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { data: session } = useSession();
   const { currentStash, refreshStashes, setCurrentStash, stashes } = useStash();
   const [stashDetails, setStashDetails] = useState<StashDetails | null>(null);
@@ -122,7 +122,7 @@ export default function StashPage() {
       const response = await fetch(`/api/stashes/${currentStash.id}/invitations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: inviteEmail.trim() }),
+        body: JSON.stringify({ email: inviteEmail.trim(), language }),
       });
 
       if (!response.ok) {

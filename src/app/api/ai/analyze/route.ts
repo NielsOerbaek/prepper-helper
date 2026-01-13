@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     console.log("[AI Analyze] expirationImageBase64 length:", body.expirationImageBase64?.length || 0);
     console.log("[AI Analyze] expirationMimeType:", body.expirationMimeType);
 
-    const { photoId, imageBase64, mimeType, expirationImageBase64, expirationMimeType } = body;
+    const { photoId, imageBase64, mimeType, expirationImageBase64, expirationMimeType, language } = body;
 
     if (!imageBase64 || !mimeType) {
       console.log("[AI Analyze] Missing required fields - imageBase64:", !!imageBase64, "mimeType:", !!mimeType);
@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
       { base64: imageBase64, mimeType },
       expirationImageBase64 && expirationMimeType
         ? { base64: expirationImageBase64, mimeType: expirationMimeType }
-        : undefined
+        : undefined,
+      language === "da" ? "da" : "en"
     );
     console.log("[AI Analyze] Analysis result:", analysis);
 

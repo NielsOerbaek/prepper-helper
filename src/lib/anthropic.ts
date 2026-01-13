@@ -19,7 +19,8 @@ interface ImageInput {
 
 export async function analyzeImages(
   frontImage: ImageInput,
-  expirationImage?: ImageInput
+  expirationImage?: ImageInput,
+  language: "da" | "en" = "en"
 ): Promise<AnalysisResult> {
   console.log("[Anthropic] analyzeImages called");
   console.log("[Anthropic] frontImage base64 length:", frontImage.base64?.length || 0);
@@ -52,6 +53,10 @@ export async function analyzeImages(
     });
   }
 
+  const languageInstruction = language === "da"
+    ? "IMPORTANT: Write the name and description in Danish."
+    : "Write the name and description in English.";
+
   const promptText = expirationImage
     ? `You are analyzing two images of a food or emergency supply item:
 - Image 1: The front/label of the product
@@ -65,6 +70,8 @@ Extract the following information and return it as JSON:
 4. "category": One of: WATER, CANNED_FOOD, DRY_GOODS, FIRST_AID, TOOLS, HYGIENE, DOCUMENTS, OTHER
 5. "confidence": A number from 0 to 1 indicating how confident you are in the analysis
 
+${languageInstruction}
+
 Return ONLY valid JSON, no other text. Example:
 {"name": "Campbell's Chicken Noodle Soup", "description": "Canned soup, ready to heat and serve", "expirationDate": "2025-06-15", "category": "CANNED_FOOD", "confidence": 0.95}`
     : `Analyze this image of a food or emergency supply item. Extract the following information and return it as JSON:
@@ -74,6 +81,8 @@ Return ONLY valid JSON, no other text. Example:
 3. "expirationDate": The expiration date if visible (format: YYYY-MM-DD), or null if not visible
 4. "category": One of: WATER, CANNED_FOOD, DRY_GOODS, FIRST_AID, TOOLS, HYGIENE, DOCUMENTS, OTHER
 5. "confidence": A number from 0 to 1 indicating how confident you are in the analysis
+
+${languageInstruction}
 
 Return ONLY valid JSON, no other text. Example:
 {"name": "Campbell's Chicken Noodle Soup", "description": "Canned soup, ready to heat and serve", "expirationDate": "2025-06-15", "category": "CANNED_FOOD", "confidence": 0.95}`;
@@ -123,8 +132,8 @@ Return ONLY valid JSON, no other text. Example:
 }
 
 // Keep backwards compatibility
-export async function analyzeImage(imageBase64: string, mimeType: string): Promise<AnalysisResult> {
-  return analyzeImages({ base64: imageBase64, mimeType });
+export async function analyzeImage(imageBase64: string, mimeType: string, language: "da" | "en" = "en"): Promise<AnalysisResult> {
+  return analyzeImages({ base64: imageBase64, mimeType }, undefined, language);
 }
 
 export default anthropic;

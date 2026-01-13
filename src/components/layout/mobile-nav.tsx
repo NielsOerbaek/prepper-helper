@@ -49,7 +49,7 @@ export function MobileNav() {
     <div className="flex flex-col gap-4 py-4">
       <Link href="/" className="flex items-center gap-2 font-semibold px-2">
         <Package className="h-6 w-6" />
-        <span>Prepper Helper</span>
+        <span>{t("app.name")}</span>
       </Link>
       <nav className="flex flex-col gap-1">
         {navItems.map((item) => (

@@ -12,9 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, User, LogOut, Settings } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { MobileNav } from "./mobile-nav";
+import { LogOut, Settings } from "lucide-react";
 import { LanguageSwitcher } from "./language-switcher";
 import { StashSwitcher } from "./stash-switcher";
 import { useLanguage } from "@/lib/language-context";
@@ -33,19 +31,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 items-center">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64">
-            <MobileNav />
-          </SheetContent>
-        </Sheet>
-
+      <div className="container mx-auto flex h-14 items-center px-4">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <Image
             src="/icon.png"
