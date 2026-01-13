@@ -8,17 +8,70 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
-  email         String?         @unique
-  passwordHash  String?
-  promiseId     String?         @unique
-  name          String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  items         Item[]
+  id               String        @id @default(cuid())
+  email            String?       @unique
+  passwordHash     String?
+  promiseId        String?       @unique
+  name             String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  sessions         Session[]
+  accounts         Account[]
+  stashMemberships StashMember[]
+}
+
+model Stash {
+  id             String            @id @default(cuid())
+  name           String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  members        StashMember[]
+  invitations    StashInvitation[]
+  items          Item[]
   checklistItems ChecklistItem[]
-  sessions      Session[]
-  accounts      Account[]
+}
+
+model StashMember {
+  id        String    @id @default(cuid())
+  stashId   String
+  stash     Stash     @relation(fields: [stashId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      StashRole @default(MEMBER)
+  createdAt DateTime  @default(now())
+
+  @@unique([stashId, userId])
+  @@index([userId])
+  @@index([stashId])
+}
+
+model StashInvitation {
+  id        String           @id @default(cuid())
+  stashId   String
+  stash     Stash            @relation(fields: [stashId], references: [id], onDelete: Cascade)
+  email     String?
+  userId    String?
+  invitedBy String
+  status    InvitationStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  expiresAt DateTime
+
+  @@index([stashId])
+  @@index([email])
+  @@index([userId])
+}
+
+enum StashRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
 }
 
 model Account {
@@ -50,8 +103,8 @@ model Session {
 
 model Item {
   id             String    @id @default(cuid())
-  userId         String
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stashId        String
+  stash          Stash     @relation(fields: [stashId], references: [id], onDelete: Cascade)
   name           String
   description    String?
   category       Category  @default(OTHER)
@@ -62,7 +115,7 @@ model Item {
   updatedAt      DateTime  @updatedAt
   photos         Photo[]
 
-  @@index([userId])
+  @@index([stashId])
   @@index([expirationDate])
 }
 
@@ -82,8 +135,8 @@ model Photo {
 
 model ChecklistItem {
   id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stashId      String
+  stash        Stash    @relation(fields: [stashId], references: [id], onDelete: Cascade)
   name         String
   category     Category
   isDefault    Boolean  @default(false)
@@ -92,8 +145,8 @@ model ChecklistItem {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@unique([userId, name])
-  @@index([userId])
+  @@unique([stashId, name])
+  @@index([stashId])
 }
 
 enum Category {

@@ -25,6 +25,7 @@ import {
 import { Category } from "@prisma/client";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import { getCategoryKey } from "@/lib/translations";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -138,7 +139,7 @@ export function ItemForm({
                     >
                       {(["WATER", "CANNED_FOOD", "DRY_GOODS", "FIRST_AID", "TOOLS", "HYGIENE", "DOCUMENTS", "OTHER"] as Category[]).map((value) => (
                         <option key={value} value={value}>
-                          {t(`category.${value}` as const)}
+                          {t(getCategoryKey(value))}
                         </option>
                       ))}
                     </select>

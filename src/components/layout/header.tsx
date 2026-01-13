@@ -16,6 +16,7 @@ import { Menu, User, LogOut, Settings } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MobileNav } from "./mobile-nav";
 import { LanguageSwitcher } from "./language-switcher";
+import { StashSwitcher } from "./stash-switcher";
 import { useLanguage } from "@/lib/language-context";
 
 export function Header() {
@@ -55,6 +56,12 @@ export function Header() {
           />
           <span className="hidden sm:inline">{t("app.name")}</span>
         </Link>
+
+        {session && (
+          <div className="ml-4">
+            <StashSwitcher />
+          </div>
+        )}
 
         <nav className="hidden md:flex ml-6 gap-4">
           <Link

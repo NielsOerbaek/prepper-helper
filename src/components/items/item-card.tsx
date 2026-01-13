@@ -9,6 +9,7 @@ import { ExpirationBadge } from "./expiration-badge";
 import { Category } from "@prisma/client";
 import { Pencil, Trash2, Camera, ImageIcon } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import { getCategoryKey } from "@/lib/translations";
 
 interface Photo {
   id: string;
@@ -63,7 +64,7 @@ export function ItemCard({ item, onEdit, onDelete, onAddPhoto }: ItemCardProps) 
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg line-clamp-1">{item.name}</CardTitle>
-          <Badge variant="outline">{t(`category.${item.category}` as const)}</Badge>
+          <Badge variant="outline">{t(getCategoryKey(item.category))}</Badge>
         </div>
       </CardHeader>
       <CardContent className="pb-2">

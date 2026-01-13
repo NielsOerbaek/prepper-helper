@@ -5,23 +5,45 @@ import { authOptions } from "@/lib/auth";
 import { DEFAULT_CHECKLIST_ITEMS } from "@/types";
 import { Category } from "@prisma/client";
 
-export async function GET() {
+// Helper to verify stash membership
+async function verifyStashMembership(stashId: string, userId: string) {
+  return prisma.stashMember.findUnique({
+    where: { stashId_userId: { stashId, userId } },
+  });
+}
+
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user has checklist items, if not create defaults
+    const stashId = request.nextUrl.searchParams.get("stashId");
+
+    if (!stashId) {
+      return NextResponse.json(
+        { error: "stashId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Verify user is a member of this stash
+    const membership = await verifyStashMembership(stashId, session.user.id);
+    if (!membership) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Check if stash has checklist items, if not create defaults
     const existingItems = await prisma.checklistItem.findMany({
-      where: { userId: session.user.id },
+      where: { stashId },
     });
 
     if (existingItems.length === 0) {
-      // Create default checklist items
+      // Create default checklist items for this stash
       await prisma.checklistItem.createMany({
         data: DEFAULT_CHECKLIST_ITEMS.map((item) => ({
-          userId: session.user.id,
+          stashId,
           name: item.name,
           category: item.category,
           isDefault: true,
@@ -30,7 +52,7 @@ export async function GET() {
     }
 
     const items = await prisma.checklistItem.findMany({
-      where: { userId: session.user.id },
+      where: { stashId },
       orderBy: [
         { category: "asc" },
         { name: "asc" },
@@ -55,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, category } = body;
+    const { name, category, stashId } = body;
 
     if (!name || !category) {
       return NextResponse.json(
@@ -64,9 +86,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!stashId) {
+      return NextResponse.json(
+        { error: "stashId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Verify user is a member of this stash
+    const membership = await verifyStashMembership(stashId, session.user.id);
+    if (!membership) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const item = await prisma.checklistItem.create({
       data: {
-        userId: session.user.id,
+        stashId,
         name,
         category: category as Category,
         isDefault: false,
@@ -101,8 +136,14 @@ export async function PATCH(request: NextRequest) {
       where: { id },
     });
 
-    if (!existingItem || existingItem.userId !== session.user.id) {
+    if (!existingItem) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    // Verify user is a member of this stash
+    const membership = await verifyStashMembership(existingItem.stashId, session.user.id);
+    if (!membership) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const item = await prisma.checklistItem.update({
@@ -141,8 +182,14 @@ export async function DELETE(request: NextRequest) {
       where: { id },
     });
 
-    if (!existingItem || existingItem.userId !== session.user.id) {
+    if (!existingItem) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    // Verify user is a member of this stash
+    const membership = await verifyStashMembership(existingItem.stashId, session.user.id);
+    if (!membership) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await prisma.checklistItem.delete({

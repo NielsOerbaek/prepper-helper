@@ -26,13 +26,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password and create user
+    // Hash password and create user with default stash
     const passwordHash = await hashPassword(password);
     const user = await prisma.user.create({
       data: {
         email,
         passwordHash,
         name,
+        stashMemberships: {
+          create: {
+            role: "OWNER",
+            stash: {
+              create: {
+                name: "My Stash",
+              },
+            },
+          },
+        },
       },
       select: {
         id: true,

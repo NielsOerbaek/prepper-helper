@@ -19,6 +19,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useLanguage } from "@/lib/language-context";
+import { useStash } from "@/lib/stash-context";
+import { getCategoryKey } from "@/lib/translations";
 
 interface ChecklistItemType {
   id: string;
@@ -31,6 +33,7 @@ interface ChecklistItemType {
 
 export default function ChecklistPage() {
   const { t } = useLanguage();
+  const { currentStash, isLoading: stashLoading } = useStash();
   const [items, setItems] = useState<ChecklistItemType[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -40,8 +43,14 @@ export default function ChecklistPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const fetchChecklist = useCallback(async () => {
+    if (!currentStash) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/checklist");
+      const response = await fetch(`/api/checklist?stashId=${currentStash.id}`);
       const data = await response.json();
       setItems(data);
     } catch (error) {
@@ -50,7 +59,7 @@ export default function ChecklistPage() {
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [currentStash, t]);
 
   useEffect(() => {
     fetchChecklist();
@@ -103,6 +112,8 @@ export default function ChecklistPage() {
       return;
     }
 
+    if (!currentStash) return;
+
     setIsAdding(true);
     try {
       const response = await fetch("/api/checklist", {
@@ -111,6 +122,7 @@ export default function ChecklistPage() {
         body: JSON.stringify({
           name: newItemName.trim(),
           category: newItemCategory,
+          stashId: currentStash.id,
         }),
       });
 
@@ -144,12 +156,23 @@ export default function ChecklistPage() {
   const checkedCount = items.filter((item) => item.isChecked).length;
   const progress = items.length > 0 ? Math.round((checkedCount / items.length) * 100) : 0;
 
-  if (loading) {
+  if (stashLoading || loading) {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">{t("checklist.emergencyChecklist")}</h1>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentStash) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">{t("checklist.emergencyChecklist")}</h1>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">{t("stash.noStash")}</p>
         </div>
       </div>
     );
@@ -181,7 +204,7 @@ export default function ChecklistPage() {
         {Object.entries(groupedItems).map(([category, categoryItems]) => (
           <Card key={category}>
             <CardHeader>
-              <CardTitle>{t(`category.${category}` as const)}</CardTitle>
+              <CardTitle>{t(getCategoryKey(category))}</CardTitle>
               <CardDescription>
                 {categoryItems.filter((i) => i.isChecked).length} {t("common.of")} {categoryItems.length} {t("checklist.itemsChecked")}
               </CardDescription>
@@ -226,7 +249,7 @@ export default function ChecklistPage() {
               >
                 {(["WATER", "CANNED_FOOD", "DRY_GOODS", "FIRST_AID", "TOOLS", "HYGIENE", "DOCUMENTS", "OTHER"] as Category[]).map((value) => (
                   <option key={value} value={value}>
-                    {t(`category.${value}` as const)}
+                    {t(getCategoryKey(value))}
                   </option>
                 ))}
               </select>

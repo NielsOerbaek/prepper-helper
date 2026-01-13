@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useLanguage } from "@/lib/language-context";
+import { useStash } from "@/lib/stash-context";
+import { getCategoryKey } from "@/lib/translations";
 
 interface Item {
   id: string;
@@ -24,13 +26,20 @@ interface Item {
 
 export default function ExpiringPage() {
   const { t } = useLanguage();
+  const { currentStash, isLoading: stashLoading } = useStash();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
+    if (!currentStash) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/items");
+      const response = await fetch(`/api/items?stashId=${currentStash.id}`);
       const data = await response.json();
 
       // Filter and sort items with expiration dates
@@ -49,7 +58,7 @@ export default function ExpiringPage() {
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [currentStash, t]);
 
   useEffect(() => {
     fetchItems();
@@ -80,12 +89,23 @@ export default function ExpiringPage() {
   const warningItems = items.filter((item) => getExpirationStatus(item.expirationDate) === "warning");
   const safeItems = items.filter((item) => getExpirationStatus(item.expirationDate) === "safe");
 
-  if (loading) {
+  if (stashLoading || loading) {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">{t("expiring.title")}</h1>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentStash) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">{t("expiring.title")}</h1>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">{t("stash.noStash")}</p>
         </div>
       </div>
     );
@@ -97,7 +117,7 @@ export default function ExpiringPage() {
         <p className="font-medium truncate">{item.name}</p>
         <div className="flex items-center gap-2 mt-1">
           <Badge variant="outline" className="text-xs">
-            {t(`category.${item.category}` as const)}
+            {t(getCategoryKey(item.category))}
           </Badge>
           <span className="text-xs text-muted-foreground">{t("item.quantity")}: {item.quantity}</span>
         </div>

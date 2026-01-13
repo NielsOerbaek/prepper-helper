@@ -13,6 +13,8 @@ import { Category } from "@prisma/client";
 import { Plus, Search, Filter, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/language-context";
+import { useStash } from "@/lib/stash-context";
+import { getCategoryKey } from "@/lib/translations";
 
 interface Item {
   id: string;
@@ -26,6 +28,7 @@ interface Item {
 
 export default function InventoryPage() {
   const { t } = useLanguage();
+  const { currentStash, isLoading: stashLoading } = useStash();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -52,8 +55,15 @@ export default function InventoryPage() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
+    if (!currentStash) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       const params = new URLSearchParams();
+      params.set("stashId", currentStash.id);
       if (search) params.set("search", search);
       if (categoryFilter) params.set("category", categoryFilter);
 
@@ -72,7 +82,7 @@ export default function InventoryPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, categoryFilter, t]);
+  }, [currentStash, search, categoryFilter, t]);
 
   useEffect(() => {
     fetchItems();
@@ -85,11 +95,13 @@ export default function InventoryPage() {
     quantity: number;
     expirationDate?: string;
   }) => {
+    if (!currentStash) return;
+
     try {
       const response = await fetch("/api/items", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, stashId: currentStash.id }),
       });
 
       if (!response.ok) throw new Error("Failed to create item");
@@ -298,14 +310,14 @@ export default function InventoryPage() {
     quantity: number;
     expirationDate?: string;
   }) => {
-    if (!pendingScanData) return;
+    if (!pendingScanData || !currentStash) return;
 
     try {
       // Create the item with verified data
       const createResponse = await fetch("/api/items", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(confirmedData),
+        body: JSON.stringify({ ...confirmedData, stashId: currentStash.id }),
       });
 
       if (!createResponse.ok) throw new Error("Failed to create item");
@@ -387,16 +399,20 @@ export default function InventoryPage() {
             <option value="">{t("inventory.allCategories")}</option>
             {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
-                {t(`category.${value}` as const)}
+                {t(getCategoryKey(value))}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      {loading ? (
+      {stashLoading || loading ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : !currentStash ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground mb-4">{t("stash.noStash")}</p>
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-12">

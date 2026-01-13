@@ -4,6 +4,13 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { deleteObject } from "@/lib/minio";
 
+// Helper to verify stash membership
+async function verifyStashMembership(stashId: string, userId: string) {
+  return prisma.stashMember.findUnique({
+    where: { stashId_userId: { stashId, userId } },
+  });
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -25,7 +32,9 @@ export async function GET(
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
 
-    if (item.userId !== session.user.id) {
+    // Verify user is a member of the item's stash
+    const membership = await verifyStashMembership(item.stashId, session.user.id);
+    if (!membership) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -52,7 +61,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    // Check ownership
+    // Get existing item
     const existingItem = await prisma.item.findUnique({
       where: { id },
     });
@@ -61,7 +70,9 @@ export async function PATCH(
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
 
-    if (existingItem.userId !== session.user.id) {
+    // Verify user is a member of the item's stash
+    const membership = await verifyStashMembership(existingItem.stashId, session.user.id);
+    if (!membership) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -103,7 +114,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Check ownership and get photos
+    // Get item with photos
     const existingItem = await prisma.item.findUnique({
       where: { id },
       include: { photos: true },
@@ -113,7 +124,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
 
-    if (existingItem.userId !== session.user.id) {
+    // Verify user is a member of the item's stash
+    const membership = await verifyStashMembership(existingItem.stashId, session.user.id);
+    if (!membership) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

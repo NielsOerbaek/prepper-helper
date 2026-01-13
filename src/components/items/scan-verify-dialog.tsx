@@ -13,6 +13,7 @@ import {
 import { Category } from "@prisma/client";
 import { Loader2, Minus, Plus } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import { getCategoryKey } from "@/lib/translations";
 import Image from "next/image";
 
 interface Photo {
@@ -222,7 +223,7 @@ export function ScanVerifyDialog({
               >
                 {(["WATER", "CANNED_FOOD", "DRY_GOODS", "FIRST_AID", "TOOLS", "HYGIENE", "DOCUMENTS", "OTHER"] as Category[]).map((value) => (
                   <option key={value} value={value}>
-                    {t(`category.${value}` as const)}
+                    {t(getCategoryKey(value))}
                   </option>
                 ))}
               </select>

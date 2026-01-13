@@ -4,6 +4,13 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { Category } from "@prisma/client";
 
+// Helper to verify stash membership
+async function verifyStashMembership(stashId: string, userId: string) {
+  return prisma.stashMember.findUnique({
+    where: { stashId_userId: { stashId, userId } },
+  });
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -12,12 +19,26 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
+    const stashId = searchParams.get("stashId");
     const category = searchParams.get("category") as Category | null;
     const search = searchParams.get("search");
     const expiringSoon = searchParams.get("expiringSoon") === "true";
 
+    if (!stashId) {
+      return NextResponse.json(
+        { error: "stashId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Verify user is a member of this stash
+    const membership = await verifyStashMembership(stashId, session.user.id);
+    if (!membership) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const where: Record<string, unknown> = {
-      userId: session.user.id,
+      stashId,
     };
 
     if (category) {
@@ -69,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, category, quantity, expirationDate } = body;
+    const { name, description, category, quantity, expirationDate, stashId } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -78,9 +99,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!stashId) {
+      return NextResponse.json(
+        { error: "stashId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Verify user is a member of this stash
+    const membership = await verifyStashMembership(stashId, session.user.id);
+    if (!membership) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const item = await prisma.item.create({
       data: {
-        userId: session.user.id,
+        stashId,
         name,
         description,
         category: category || "OTHER",

@@ -1108,6 +1108,235 @@ export const translations = {
     da: "Bekræft",
     en: "Confirm",
   },
+  "common.create": {
+    da: "Opret",
+    en: "Create",
+  },
+  "common.creating": {
+    da: "Opretter...",
+    en: "Creating...",
+  },
+  "common.leave": {
+    da: "Forlad",
+    en: "Leave",
+  },
+  "common.invite": {
+    da: "Inviter",
+    en: "Invite",
+  },
+  "common.pending": {
+    da: "Afventer",
+    en: "Pending",
+  },
+  "common.accept": {
+    da: "Accepter",
+    en: "Accept",
+  },
+  "common.decline": {
+    da: "Afvis",
+    en: "Decline",
+  },
+
+  // Stash
+  "stash.title": {
+    da: "Stash",
+    en: "Stash",
+  },
+  "stash.loading": {
+    da: "Indlæser...",
+    en: "Loading...",
+  },
+  "stash.noStash": {
+    da: "Ingen stash",
+    en: "No stash",
+  },
+  "stash.selectStash": {
+    da: "Vælg stash",
+    en: "Select stash",
+  },
+  "stash.createStash": {
+    da: "Opret stash",
+    en: "Create stash",
+  },
+  "stash.createDescription": {
+    da: "Opret en ny stash til at organisere dine forsyninger",
+    en: "Create a new stash to organize your supplies",
+  },
+  "stash.manageStash": {
+    da: "Administrer stash",
+    en: "Manage stash",
+  },
+  "stash.name": {
+    da: "Navn",
+    en: "Name",
+  },
+  "stash.namePlaceholder": {
+    da: "f.eks. Sommerhus, Kontor",
+    en: "e.g., Summer house, Office",
+  },
+  "stash.members": {
+    da: "Medlemmer",
+    en: "Members",
+  },
+  "stash.invitations": {
+    da: "Invitationer",
+    en: "Invitations",
+  },
+  "stash.invite": {
+    da: "Inviter",
+    en: "Invite",
+  },
+  "stash.inviteByEmail": {
+    da: "Inviter med email",
+    en: "Invite by email",
+  },
+  "stash.inviteDescription": {
+    da: "Inviter nogen til at deltage i denne stash",
+    en: "Invite someone to join this stash",
+  },
+  "stash.emailPlaceholder": {
+    da: "Email adresse",
+    en: "Email address",
+  },
+  "stash.pendingInvitations": {
+    da: "Afventende invitationer",
+    en: "Pending invitations",
+  },
+  "stash.noPendingInvitations": {
+    da: "Ingen afventende invitationer",
+    en: "No pending invitations",
+  },
+  "stash.cancelInvitation": {
+    da: "Annuller invitation",
+    en: "Cancel invitation",
+  },
+  "stash.role.owner": {
+    da: "Ejer",
+    en: "Owner",
+  },
+  "stash.role.admin": {
+    da: "Admin",
+    en: "Admin",
+  },
+  "stash.role.member": {
+    da: "Medlem",
+    en: "Member",
+  },
+  "stash.leave": {
+    da: "Forlad stash",
+    en: "Leave stash",
+  },
+  "stash.leaveConfirm": {
+    da: "Er du sikker på at du vil forlade denne stash? Du mister adgang til alle varerne.",
+    en: "Are you sure you want to leave this stash? You will lose access to all items.",
+  },
+  "stash.delete": {
+    da: "Slet stash",
+    en: "Delete stash",
+  },
+  "stash.deleteConfirm": {
+    da: "Er du sikker? Alle varer i denne stash vil blive slettet permanent.",
+    en: "Are you sure? All items in this stash will be permanently deleted.",
+  },
+  "stash.cannotDeleteOnly": {
+    da: "Du kan ikke slette din eneste stash",
+    en: "You cannot delete your only stash",
+  },
+  "stash.removeMember": {
+    da: "Fjern medlem",
+    en: "Remove member",
+  },
+  "stash.removeMemberConfirm": {
+    da: "Er du sikker på at du vil fjerne dette medlem?",
+    en: "Are you sure you want to remove this member?",
+  },
+  "stash.changeRole": {
+    da: "Skift rolle",
+    en: "Change role",
+  },
+  "stash.you": {
+    da: "(dig)",
+    en: "(you)",
+  },
+  "stash.settings": {
+    da: "Stash indstillinger",
+    en: "Stash settings",
+  },
+  "stash.settingsDescription": {
+    da: "Administrer din stash, medlemmer og invitationer",
+    en: "Manage your stash, members, and invitations",
+  },
+  "stash.yourInvitations": {
+    da: "Dine invitationer",
+    en: "Your invitations",
+  },
+  "stash.invitedTo": {
+    da: "Du er inviteret til",
+    en: "You have been invited to",
+  },
+  "stash.noInvitations": {
+    da: "Ingen invitationer",
+    en: "No invitations",
+  },
+  "stash.expiresAt": {
+    da: "Udløber",
+    en: "Expires",
+  },
+  "stash.invitationAccepted": {
+    da: "Invitation accepteret!",
+    en: "Invitation accepted!",
+  },
+  "stash.invitationDeclined": {
+    da: "Invitation afvist",
+    en: "Invitation declined",
+  },
+  "stash.invitationSent": {
+    da: "Invitation sendt!",
+    en: "Invitation sent!",
+  },
+  "stash.invitationCanceled": {
+    da: "Invitation annulleret",
+    en: "Invitation canceled",
+  },
+  "stash.memberRemoved": {
+    da: "Medlem fjernet",
+    en: "Member removed",
+  },
+  "stash.leftStash": {
+    da: "Du har forladt stashen",
+    en: "You have left the stash",
+  },
+  "stash.stashDeleted": {
+    da: "Stash slettet",
+    en: "Stash deleted",
+  },
+  "stash.stashCreated": {
+    da: "Stash oprettet!",
+    en: "Stash created!",
+  },
+  "stash.stashUpdated": {
+    da: "Stash opdateret",
+    en: "Stash updated",
+  },
+  "stash.itemCount": {
+    da: "varer",
+    en: "items",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
+
+// Type-safe category key helper
+export type CategoryKey =
+  | "category.WATER"
+  | "category.CANNED_FOOD"
+  | "category.DRY_GOODS"
+  | "category.FIRST_AID"
+  | "category.TOOLS"
+  | "category.HYGIENE"
+  | "category.DOCUMENTS"
+  | "category.OTHER";
+
+export function getCategoryKey(category: string): CategoryKey {
+  return `category.${category}` as CategoryKey;
+}
