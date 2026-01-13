@@ -1,3 +1,7 @@
 prep.raakode.dk {
-    reverse_proxy 172.18.0.1:3000
+    reverse_proxy app:3000
+}
+
+s3.prep.raakode.dk {
+    reverse_proxy minio:9000
 }
