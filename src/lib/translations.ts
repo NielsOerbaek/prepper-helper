@@ -1,6 +1,12 @@
 export type Language = "da" | "en";
 
 export const translations = {
+  // App
+  "app.name": {
+    da: "Prepperhjælper",
+    en: "Prepper Helper",
+  },
+
   // Navigation
   "nav.dashboard": {
     da: "Oversigt",

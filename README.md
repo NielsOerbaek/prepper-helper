@@ -1,4 +1,4 @@
-# Prep - Emergency Food Tracker
+# Prepper Helper / Prepperhjælper
 
 A Progressive Web App (PWA) for tracking emergency food supplies and inventory with AI-powered item recognition.
 

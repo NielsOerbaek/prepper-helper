@@ -48,12 +48,12 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <Image
             src="/icon.png"
-            alt="Prep"
+            alt={t("app.name")}
             width={32}
             height={32}
             className="rounded-md shadow-md"
           />
-          <span className="hidden sm:inline">Prep</span>
+          <span className="hidden sm:inline">{t("app.name")}</span>
         </Link>
 
         <nav className="hidden md:flex ml-6 gap-4">

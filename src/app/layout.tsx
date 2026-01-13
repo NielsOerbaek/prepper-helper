@@ -9,21 +9,21 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Emergency Food Tracker",
+  title: "Prepper Helper",
   description: "AI-powered emergency food and supply inventory management",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Food Tracker",
+    title: "Prepper Helper",
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: "website",
-    siteName: "Emergency Food Tracker",
-    title: "Emergency Food Tracker",
+    siteName: "Prepper Helper",
+    title: "Prepper Helper",
     description: "AI-powered emergency food and supply inventory management",
   },
 };

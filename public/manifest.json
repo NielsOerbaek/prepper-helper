@@ -1,6 +1,6 @@
 {
-  "name": "Emergency Food Tracker",
-  "short_name": "Food Tracker",
+  "name": "Prepper Helper",
+  "short_name": "Prepper",
   "description": "AI-powered emergency food and supply inventory management",
   "start_url": "/",
   "display": "standalone",
