@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd /root/emergency-food-tracker
+cd /root/prepper-helper
 
 echo "=== Quick Deploy ==="
 

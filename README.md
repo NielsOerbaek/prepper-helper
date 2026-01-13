@@ -59,8 +59,8 @@ ANTHROPIC_API_KEY=your-anthropic-api-key
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/emergency-food-tracker.git
-cd emergency-food-tracker
+git clone https://github.com/yourusername/prepper-helper.git
+cd prepper-helper
 ```
 
 2. Install dependencies:

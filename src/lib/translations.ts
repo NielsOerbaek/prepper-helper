@@ -43,7 +43,7 @@ export const translations = {
     en: "Sign in",
   },
   "auth.signInDescription": {
-    da: "Log ind på din Prepper Helper konto",
+    da: "Log ind på din Prepperhjælper konto",
     en: "Sign in to your Prepper Helper account",
   },
   "auth.signInWithPromise": {
@@ -843,7 +843,7 @@ export const translations = {
     en: "View about page",
   },
   "about.title": {
-    da: "Om Prepper Helper",
+    da: "Om Prepperhjælper",
     en: "About Prepper Helper",
   },
   "about.description": {
@@ -851,11 +851,11 @@ export const translations = {
     en: "Your intelligent emergency preparedness assistant",
   },
   "about.whatIs": {
-    da: "Hvad er Prepper Helper?",
+    da: "Hvad er Prepperhjælper?",
     en: "What is Prepper Helper?",
   },
   "about.whatIsDescription": {
-    da: "Prepper Helper er en app designet til at hjælpe dig med at organisere og holde styr på dine nødforsyninger. Med AI-drevet billedgenkendelse kan du nemt scanne og katalogisere dine varer, holde øje med udløbsdatoer og sikre at du altid er forberedt.",
+    da: "Prepperhjælper er en app designet til at hjælpe dig med at organisere og holde styr på dine nødforsyninger. Med AI-drevet billedgenkendelse kan du nemt scanne og katalogisere dine varer, holde øje med udløbsdatoer og sikre at du altid er forberedt.",
     en: "Prepper Helper is an app designed to help you organize and track your emergency supplies. With AI-powered image recognition, you can easily scan and catalog your items, monitor expiration dates, and ensure you're always prepared.",
   },
   "about.features": {
