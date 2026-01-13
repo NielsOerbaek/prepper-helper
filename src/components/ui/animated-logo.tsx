@@ -25,7 +25,7 @@ interface AnimatedLogoProps {
 export function AnimatedLogo({
   size = 400,
   className,
-  animationDuration = 3000,
+  animationDuration = 2000,
   shimmerInterval = 10000,
 }: AnimatedLogoProps) {
   const [visibleCells, setVisibleCells] = useState<Set<string>>(new Set());
@@ -104,7 +104,11 @@ export function AnimatedLogo({
 
   return (
     <div
-      className={cn("relative", className)}
+      className={cn(
+        "relative transition-shadow duration-500",
+        isComplete && "shadow-lg",
+        className
+      )}
       style={{ width: size, height: size }}
     >
       {/* Grid container */}
