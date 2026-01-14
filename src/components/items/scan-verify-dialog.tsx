@@ -181,7 +181,7 @@ export function ScanVerifyDialog({
           <DialogTitle>{title || t("scan.verifyTitle")}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 overflow-y-auto flex-1 min-h-0 pb-2">
+        <div className="space-y-3 overflow-y-auto flex-1 min-h-0 pb-2">
           {/* Image previews - base64 for new scans */}
           {hasBase64Previews && (
             <div className="flex gap-2 justify-center">
@@ -189,14 +189,14 @@ export function ScanVerifyDialog({
                 <img
                   src={`data:image/jpeg;base64,${frontImagePreview}`}
                   alt={t("camera.frontLabel")}
-                  className="w-20 h-20 object-cover rounded-md border"
+                  className="w-14 h-14 object-cover rounded-md border"
                 />
               )}
               {expirationImagePreview && (
                 <img
                   src={`data:image/jpeg;base64,${expirationImagePreview}`}
                   alt={t("camera.expirationLabel")}
-                  className="w-20 h-20 object-cover rounded-md border"
+                  className="w-14 h-14 object-cover rounded-md border"
                 />
               )}
             </div>
@@ -210,49 +210,18 @@ export function ScanVerifyDialog({
                   key={photo.id}
                   src={`/api/photos/${photo.id}`}
                   alt={photo.originalName || "Photo"}
-                  width={80}
-                  height={80}
-                  className="w-20 h-20 object-cover rounded-md border"
+                  width={56}
+                  height={56}
+                  className="w-14 h-14 object-cover rounded-md border"
                   unoptimized
                 />
               ))}
             </div>
           )}
 
-          {/* Quantity selector - large and prominent */}
-          <div className="bg-muted/50 rounded-lg p-4">
-            <label className="block text-sm font-medium text-center mb-3">
-              {t("item.quantity")}
-            </label>
-            <div className="flex items-center justify-center gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="h-14 w-14 rounded-full"
-                onClick={decrementQuantity}
-                disabled={quantity <= 1}
-              >
-                <Minus className="h-6 w-6" />
-              </Button>
-              <span className="text-5xl font-bold min-w-[80px] text-center tabular-nums">
-                {quantity}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="h-14 w-14 rounded-full"
-                onClick={incrementQuantity}
-              >
-                <Plus className="h-6 w-6" />
-              </Button>
-            </div>
-          </div>
-
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium mb-1.5">
+            <label className="block text-sm font-medium mb-1">
               {t("item.name")}
             </label>
             <Input
@@ -262,106 +231,137 @@ export function ScanVerifyDialog({
             />
           </div>
 
-          {/* Category */}
-          <div>
-            <label className="block text-sm font-medium mb-1.5">
-              {t("item.category")}
-            </label>
-            <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              value={category}
-              onChange={(e) => setCategory(e.target.value as Category)}
-            >
-              {(["WATER", "CANNED_FOOD", "DRY_GOODS", "FIRST_AID", "TOOLS", "HYGIENE", "DOCUMENTS", "OTHER"] as Category[]).map((value) => (
-                <option key={value} value={value}>
-                  {t(getCategoryKey(value))}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Expiration date with increment/decrement buttons */}
-          <div className="bg-muted/50 rounded-lg p-4">
-            <label className="block text-sm font-medium text-center mb-3">
-              {t("item.expirationDate")}
-            </label>
-            <div className="flex items-center justify-center gap-2">
-              {/* Day */}
-              <div className="flex flex-col items-center">
-                <span className="text-xs text-muted-foreground mb-1">{t("date.day")}</span>
+          {/* Quantity and Category row */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Quantity selector - compact */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t("item.quantity")}
+              </label>
+              <div className="flex items-center gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 w-12 rounded-t-md rounded-b-none border-b-0"
+                  className="h-10 w-10 rounded-full p-0"
+                  onClick={decrementQuantity}
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="text-2xl font-bold min-w-[40px] text-center tabular-nums">
+                  {quantity}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-10 w-10 rounded-full p-0"
+                  onClick={incrementQuantity}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t("item.category")}
+              </label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as Category)}
+              >
+                {(["WATER", "CANNED_FOOD", "DRY_GOODS", "FIRST_AID", "TOOLS", "HYGIENE", "DOCUMENTS", "OTHER"] as Category[]).map((value) => (
+                  <option key={value} value={value}>
+                    {t(getCategoryKey(value))}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Expiration date with increment/decrement buttons - compact */}
+          <div className="bg-muted/50 rounded-lg p-3">
+            <label className="block text-sm font-medium text-center mb-2">
+              {t("item.expirationDate")}
+            </label>
+            <div className="flex items-center justify-center gap-1">
+              {/* Day */}
+              <div className="flex flex-col items-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 w-11 rounded-t-md rounded-b-none border-b-0 p-0"
                   onClick={() => adjustDate("day", 1)}
                 >
                   <ChevronUp className="h-4 w-4" />
                 </Button>
-                <div className="h-10 w-12 flex items-center justify-center border border-input bg-background text-lg font-semibold tabular-nums">
+                <div className="h-8 w-11 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
                   {String(dateParts.day).padStart(2, "0")}
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 w-12 rounded-b-md rounded-t-none border-t-0"
+                  className="h-7 w-11 rounded-b-md rounded-t-none border-t-0 p-0"
                   onClick={() => adjustDate("day", -1)}
                 >
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </div>
 
-              <span className="text-xl font-bold text-muted-foreground self-center">/</span>
+              <span className="text-lg font-bold text-muted-foreground">/</span>
 
               {/* Month */}
               <div className="flex flex-col items-center">
-                <span className="text-xs text-muted-foreground mb-1">{t("date.month")}</span>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 w-12 rounded-t-md rounded-b-none border-b-0"
+                  className="h-7 w-11 rounded-t-md rounded-b-none border-b-0 p-0"
                   onClick={() => adjustDate("month", 1)}
                 >
                   <ChevronUp className="h-4 w-4" />
                 </Button>
-                <div className="h-10 w-12 flex items-center justify-center border border-input bg-background text-lg font-semibold tabular-nums">
+                <div className="h-8 w-11 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
                   {String(dateParts.month).padStart(2, "0")}
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 w-12 rounded-b-md rounded-t-none border-t-0"
+                  className="h-7 w-11 rounded-b-md rounded-t-none border-t-0 p-0"
                   onClick={() => adjustDate("month", -1)}
                 >
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </div>
 
-              <span className="text-xl font-bold text-muted-foreground self-center">/</span>
+              <span className="text-lg font-bold text-muted-foreground">/</span>
 
               {/* Year */}
               <div className="flex flex-col items-center">
-                <span className="text-xs text-muted-foreground mb-1">{t("date.year")}</span>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 w-16 rounded-t-md rounded-b-none border-b-0"
+                  className="h-7 w-14 rounded-t-md rounded-b-none border-b-0 p-0"
                   onClick={() => adjustDate("year", 1)}
                 >
                   <ChevronUp className="h-4 w-4" />
                 </Button>
-                <div className="h-10 w-16 flex items-center justify-center border border-input bg-background text-lg font-semibold tabular-nums">
+                <div className="h-8 w-14 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
                   {dateParts.year}
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-8 w-16 rounded-b-md rounded-t-none border-t-0"
+                  className="h-7 w-14 rounded-b-md rounded-t-none border-t-0 p-0"
                   onClick={() => adjustDate("year", -1)}
                 >
                   <ChevronDown className="h-4 w-4" />
