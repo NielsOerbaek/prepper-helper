@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Category } from "@prisma/client";
-import { Loader2, Minus, Plus, ChevronUp, ChevronDown } from "lucide-react";
+import { Loader2, Minus, Plus, ChevronUp, ChevronDown, X } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { getCategoryKey } from "@/lib/translations";
 import Image from "next/image";
@@ -285,89 +285,120 @@ export function ScanVerifyDialog({
 
           {/* Expiration date with increment/decrement buttons - compact */}
           <div className="bg-muted/50 rounded-lg p-3">
-            <label className="block text-sm font-medium text-center mb-2">
-              {t("item.expirationDate")}
-            </label>
-            <div className="flex items-center justify-center gap-1">
-              {/* Day */}
-              <div className="flex flex-col items-center">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium">
+                {t("item.expirationDate")}
+              </label>
+              {expirationDate ? (
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  className="h-7 w-11 rounded-t-md rounded-b-none border-b-0 p-0"
-                  onClick={() => adjustDate("day", 1)}
+                  className="h-6 px-2 text-xs text-muted-foreground"
+                  onClick={() => setExpirationDate("")}
                 >
-                  <ChevronUp className="h-4 w-4" />
+                  <X className="h-3 w-3 mr-1" />
+                  {t("expiration.noExpiration")}
                 </Button>
-                <div className="h-8 w-11 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
-                  {String(dateParts.day).padStart(2, "0")}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 w-11 rounded-b-md rounded-t-none border-t-0 p-0"
-                  onClick={() => adjustDate("day", -1)}
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <span className="text-lg font-bold text-muted-foreground">/</span>
-
-              {/* Month */}
-              <div className="flex flex-col items-center">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 w-11 rounded-t-md rounded-b-none border-b-0 p-0"
-                  onClick={() => adjustDate("month", 1)}
-                >
-                  <ChevronUp className="h-4 w-4" />
-                </Button>
-                <div className="h-8 w-11 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
-                  {String(dateParts.month).padStart(2, "0")}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 w-11 rounded-b-md rounded-t-none border-t-0 p-0"
-                  onClick={() => adjustDate("month", -1)}
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <span className="text-lg font-bold text-muted-foreground">/</span>
-
-              {/* Year */}
-              <div className="flex flex-col items-center">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 w-14 rounded-t-md rounded-b-none border-b-0 p-0"
-                  onClick={() => adjustDate("year", 1)}
-                >
-                  <ChevronUp className="h-4 w-4" />
-                </Button>
-                <div className="h-8 w-14 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
-                  {dateParts.year}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-7 w-14 rounded-b-md rounded-t-none border-t-0 p-0"
-                  onClick={() => adjustDate("year", -1)}
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </div>
+              ) : null}
             </div>
+            {expirationDate ? (
+              <div className="flex items-center justify-center gap-1">
+                {/* Day */}
+                <div className="flex flex-col items-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 w-11 rounded-t-md rounded-b-none border-b-0 p-0"
+                    onClick={() => adjustDate("day", 1)}
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <div className="h-8 w-11 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
+                    {String(dateParts.day).padStart(2, "0")}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 w-11 rounded-b-md rounded-t-none border-t-0 p-0"
+                    onClick={() => adjustDate("day", -1)}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <span className="text-lg font-bold text-muted-foreground">/</span>
+
+                {/* Month */}
+                <div className="flex flex-col items-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 w-11 rounded-t-md rounded-b-none border-b-0 p-0"
+                    onClick={() => adjustDate("month", 1)}
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <div className="h-8 w-11 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
+                    {String(dateParts.month).padStart(2, "0")}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 w-11 rounded-b-md rounded-t-none border-t-0 p-0"
+                    onClick={() => adjustDate("month", -1)}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <span className="text-lg font-bold text-muted-foreground">/</span>
+
+                {/* Year */}
+                <div className="flex flex-col items-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 w-14 rounded-t-md rounded-b-none border-b-0 p-0"
+                    onClick={() => adjustDate("year", 1)}
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </Button>
+                  <div className="h-8 w-14 flex items-center justify-center border border-input bg-background text-base font-semibold tabular-nums">
+                    {dateParts.year}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 w-14 rounded-b-md rounded-t-none border-t-0 p-0"
+                    onClick={() => adjustDate("year", -1)}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => {
+                  const today = new Date();
+                  const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+                  setExpirationDate(nextYear.toISOString().split("T")[0]);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("expiration.addExpiration")}
+              </Button>
+            )}
           </div>
 
           {/* Description */}

@@ -1108,6 +1108,10 @@ export const translations = {
     da: "Ingen udløbsdato",
     en: "No expiration",
   },
+  "expiration.addExpiration": {
+    da: "Tilføj udløbsdato",
+    en: "Add expiration date",
+  },
   "expiration.daysAgo": {
     da: "dage siden",
     en: "days ago",
