@@ -176,12 +176,12 @@ export function ScanVerifyDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
+      <DialogContent className="!flex !flex-col h-[100dvh] max-h-[100dvh] w-full max-w-full sm:max-w-[500px] sm:h-auto sm:max-h-[90dvh] rounded-none sm:rounded-lg">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{title || t("scan.verifyTitle")}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto flex-1 min-h-0 pb-2">
           {/* Image previews - base64 for new scans */}
           {hasBase64Previews && (
             <div className="flex gap-2 justify-center">
@@ -370,20 +370,22 @@ export function ScanVerifyDialog({
             </div>
           </div>
 
-          {/* Description (collapsible or smaller) */}
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium mb-1.5">
               {t("item.descriptionOptional")}
             </label>
-            <Input
+            <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t("item.descriptionPlaceholder")}
+              rows={3}
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
             />
           </div>
         </div>
 
-        <DialogFooter className="mt-4 flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-shrink-0 mt-4 flex-col sm:flex-row gap-2">
           <Button
             type="button"
             variant="outline"
