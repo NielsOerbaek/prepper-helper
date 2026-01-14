@@ -216,9 +216,25 @@ export const translations = {
     da: "Varer der udløber inden for 7 dage",
     en: "Items expiring within 7 days",
   },
+  "dashboard.expiring30Days": {
+    da: "Udløber snart",
+    en: "Expiring soon",
+  },
   "dashboard.expired": {
     da: "Udløbet",
     en: "Expired",
+  },
+  "dashboard.stillNeeded": {
+    da: "Mangler stadig",
+    en: "Still needed",
+  },
+  "dashboard.noChecklist": {
+    da: "Ingen tjekliste oprettet",
+    en: "No checklist items",
+  },
+  "dashboard.allChecked": {
+    da: "Alle varer afkrydset!",
+    en: "All items checked!",
   },
   "dashboard.categories": {
     da: "Kategorier",

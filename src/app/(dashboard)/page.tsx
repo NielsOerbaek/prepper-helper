@@ -12,8 +12,10 @@ import { toast } from "sonner";
 
 interface DashboardStats {
   totalItems: number;
-  expiringItems: number;
+  expiringSoonItems: number; // within 30 days
+  expiredItems: number;
   checklistProgress: { checked: number; total: number };
+  uncheckedItems: Array<{ id: string; name: string }>;
   recentItems: Array<{
     id: string;
     name: string;
@@ -94,8 +96,10 @@ export default function DashboardPage() {
       if (!currentStash) {
         setStats({
           totalItems: 0,
-          expiringItems: 0,
+          expiringSoonItems: 0,
+          expiredItems: 0,
           checklistProgress: { checked: 0, total: 0 },
+          uncheckedItems: [],
           recentItems: [],
         });
         setLoading(false);
@@ -104,28 +108,50 @@ export default function DashboardPage() {
 
       try {
         const stashParam = `stashId=${currentStash.id}`;
-        const [itemsRes, checklistRes, expiringRes] = await Promise.all([
+        const [itemsRes, checklistRes] = await Promise.all([
           fetch(`/api/items?${stashParam}`),
           fetch(`/api/checklist?${stashParam}`),
-          fetch(`/api/items?${stashParam}&expiringSoon=true`),
         ]);
 
         const items = await itemsRes.json();
         const checklist = await checklistRes.json();
-        const expiring = await expiringRes.json();
 
         // Handle potential error responses
         const itemsArray = Array.isArray(items) ? items : [];
         const checklistArray = Array.isArray(checklist) ? checklist : [];
-        const expiringArray = Array.isArray(expiring) ? expiring : [];
+
+        // Calculate expiring and expired items
+        const now = new Date();
+        const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        let expiringSoonCount = 0;
+        let expiredCount = 0;
+
+        itemsArray.forEach((item: { expirationDate: string | null }) => {
+          if (item.expirationDate) {
+            const expDate = new Date(item.expirationDate);
+            if (expDate < now) {
+              expiredCount++;
+            } else if (expDate <= thirtyDaysFromNow) {
+              expiringSoonCount++;
+            }
+          }
+        });
+
+        const uncheckedItems = checklistArray
+          .filter((item: { isChecked: boolean }) => !item.isChecked)
+          .slice(0, 3)
+          .map((item: { id: string; name: string }) => ({ id: item.id, name: item.name }));
 
         setStats({
           totalItems: itemsArray.length,
-          expiringItems: expiringArray.length,
+          expiringSoonItems: expiringSoonCount,
+          expiredItems: expiredCount,
           checklistProgress: {
             checked: checklistArray.filter((item: { isChecked: boolean }) => item.isChecked).length,
             total: checklistArray.length,
           },
+          uncheckedItems,
           recentItems: itemsArray.slice(0, 5).map((item: { id: string; name: string; expirationDate: string | null }) => ({
             ...item,
             expirationDate: item.expirationDate ? new Date(item.expirationDate) : null,
@@ -211,76 +237,71 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* Prominent Scanner Button */}
-      <Card className="bg-gradient-to-br from-primary/20 via-primary/10 to-background border-primary/30">
-        <CardContent className="flex flex-col items-center justify-center py-8">
-          <div className="rounded-full bg-primary/15 p-4 mb-4">
-            <Camera className="h-10 w-10 text-primary" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2">{t("dashboard.scanAnItem")}</h2>
-          <p className="text-center mb-4 text-muted-foreground">{t("dashboard.scanDescription")}</p>
-          <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
-            <Link href="/inventory?scan=true">
-              <Camera className="mr-2 h-5 w-5" />
-              {t("dashboard.startScanner")}
-            </Link>
-          </Button>
+      {/* Compact Scanner Button */}
+      <Card className="bg-gradient-to-r from-primary/20 via-primary/10 to-background border-primary/30">
+        <CardContent className="py-4">
+          <Link href="/inventory?scan=true" className="flex items-center gap-4">
+            <div className="rounded-full bg-primary/15 p-3 flex-shrink-0">
+              <Camera className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold">{t("dashboard.scanAnItem")}</h2>
+              <p className="text-sm text-muted-foreground truncate">{t("dashboard.scanDescription")}</p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          </Link>
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t("dashboard.totalItems")}</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalItems || 0}</div>
-            <p className="text-xs text-muted-foreground">{t("dashboard.itemsInInventory")}</p>
-          </CardContent>
-        </Card>
+      {/* Three compact metrics */}
+      <div className="grid grid-cols-3 gap-2">
+        <Link href="/inventory">
+          <Card className="h-full hover:bg-muted/50 transition-colors">
+            <CardContent className="p-3 text-center">
+              <Package className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+              <div className="text-2xl font-bold">{stats?.totalItems || 0}</div>
+              <p className="text-xs text-muted-foreground">{t("dashboard.totalItems")}</p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className={stats?.expiringItems ? "border-yellow-500" : ""}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t("nav.expiringSoon")}</CardTitle>
-            <AlertTriangle className={`h-4 w-4 ${stats?.expiringItems ? "text-yellow-500" : "text-muted-foreground"}`} />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.expiringItems || 0}</div>
-            <p className="text-xs text-muted-foreground">{t("dashboard.itemsExpiring7Days")}</p>
-          </CardContent>
-        </Card>
+        <Link href="/expiring">
+          <Card className={`h-full hover:bg-muted/50 transition-colors ${stats?.expiringSoonItems ? "border-yellow-500" : ""}`}>
+            <CardContent className="p-3 text-center">
+              <AlertTriangle className={`h-5 w-5 mx-auto mb-1 ${stats?.expiringSoonItems ? "text-yellow-500" : "text-muted-foreground"}`} />
+              <div className="text-2xl font-bold">{stats?.expiringSoonItems || 0}</div>
+              <p className="text-xs text-muted-foreground">{t("dashboard.expiring30Days")}</p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">{t("dashboard.checklistProgress")}</CardTitle>
-            <ClipboardList className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{checklistPercentage}%</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.checklistProgress.checked} {t("common.of")} {stats?.checklistProgress.total} {t("dashboard.itemsChecked")}
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/expiring">
+          <Card className={`h-full hover:bg-muted/50 transition-colors ${stats?.expiredItems ? "border-red-500" : ""}`}>
+            <CardContent className="p-3 text-center">
+              <X className={`h-5 w-5 mx-auto mb-1 ${stats?.expiredItems ? "text-red-500" : "text-muted-foreground"}`} />
+              <div className="text-2xl font-bold">{stats?.expiredItems || 0}</div>
+              <p className="text-xs text-muted-foreground">{t("dashboard.expired")}</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle>{t("dashboard.recentItems")}</CardTitle>
             <CardDescription>{t("dashboard.recentItemsDescription")}</CardDescription>
           </CardHeader>
           <CardContent>
             {stats?.recentItems && stats.recentItems.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {stats.recentItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between">
-                    <span className="font-medium truncate flex-1 mr-2">{item.name}</span>
+                  <div key={item.id} className="flex items-center justify-between gap-2 min-w-0">
+                    <span className="font-medium truncate text-sm">{item.name}</span>
                     <ExpirationBadge expirationDate={item.expirationDate} />
                   </div>
                 ))}
-                <Button variant="ghost" className="w-full" asChild>
+                <Button variant="ghost" className="w-full mt-2" size="sm" asChild>
                   <Link href="/inventory">
                     {t("dashboard.viewAllItems")}
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -288,10 +309,10 @@ export default function DashboardPage() {
                 </Button>
               </div>
             ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>{t("dashboard.noItemsYet")}</p>
-                <Button className="mt-2" asChild>
+              <div className="text-center py-4 text-muted-foreground">
+                <Package className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">{t("dashboard.noItemsYet")}</p>
+                <Button className="mt-2" size="sm" asChild>
                   <Link href="/inventory?scan=true">{t("dashboard.addFirstItem")}</Link>
                 </Button>
               </div>
@@ -299,32 +320,45 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("dashboard.quickActions")}</CardTitle>
-            <CardDescription>{t("dashboard.quickActionsDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-2">
-            <Button variant="outline" className="justify-start" asChild>
-              <Link href="/inventory?scan=true">
-                <Camera className="mr-2 h-4 w-4" />
-                {t("dashboard.scanNewItem")}
-              </Link>
-            </Button>
-            <Button variant="outline" className="justify-start" asChild>
-              <Link href="/checklist">
-                <ClipboardList className="mr-2 h-4 w-4" />
-                {t("dashboard.reviewChecklist")}
-              </Link>
-            </Button>
-            <Button variant="outline" className="justify-start" asChild>
-              <Link href="/expiring">
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                {t("dashboard.checkExpiringItems")}
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <Link href="/checklist" className="block">
+          <Card className="h-full hover:bg-muted/50 transition-colors">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle>{t("dashboard.checklistProgress")}</CardTitle>
+                <ClipboardList className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <CardDescription>
+                {stats?.checklistProgress.checked} {t("common.of")} {stats?.checklistProgress.total} {t("dashboard.itemsChecked")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Progress bar */}
+              <div className="w-full bg-muted rounded-full h-2 mb-3">
+                <div
+                  className="bg-primary h-2 rounded-full transition-all"
+                  style={{ width: `${checklistPercentage}%` }}
+                />
+              </div>
+
+              {/* Unchecked items examples */}
+              {stats?.uncheckedItems && stats.uncheckedItems.length > 0 ? (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground mb-2">{t("dashboard.stillNeeded")}:</p>
+                  {stats.uncheckedItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-2 text-sm">
+                      <div className="h-4 w-4 rounded border border-muted-foreground/30 flex-shrink-0" />
+                      <span className="truncate">{item.name}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : stats?.checklistProgress.total === 0 ? (
+                <p className="text-sm text-muted-foreground">{t("dashboard.noChecklist")}</p>
+              ) : (
+                <p className="text-sm text-green-600">{t("dashboard.allChecked")}</p>
+              )}
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </div>
   );
