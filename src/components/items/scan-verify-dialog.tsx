@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Category } from "@prisma/client";
-import { Loader2, Minus, Plus } from "lucide-react";
+import { Loader2, Minus, Plus, ChevronUp, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { getCategoryKey } from "@/lib/translations";
 import Image from "next/image";
@@ -119,6 +119,58 @@ export function ScanVerifyDialog({
     setQuantity(quantity + 1);
   };
 
+  // Parse the date string into components
+  const parseDateParts = () => {
+    if (!expirationDate) {
+      const today = new Date();
+      return {
+        year: today.getFullYear(),
+        month: today.getMonth() + 1,
+        day: today.getDate(),
+      };
+    }
+    const [year, month, day] = expirationDate.split("-").map(Number);
+    return { year: year || new Date().getFullYear(), month: month || 1, day: day || 1 };
+  };
+
+  const updateDate = (year: number, month: number, day: number) => {
+    // Validate day for the given month/year
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const validDay = Math.min(day, daysInMonth);
+    const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(validDay).padStart(2, "0")}`;
+    setExpirationDate(dateStr);
+  };
+
+  const adjustDate = (field: "year" | "month" | "day", delta: number) => {
+    const { year, month, day } = parseDateParts();
+
+    if (field === "year") {
+      updateDate(year + delta, month, day);
+    } else if (field === "month") {
+      let newMonth = month + delta;
+      let newYear = year;
+      if (newMonth > 12) {
+        newMonth = 1;
+        newYear++;
+      } else if (newMonth < 1) {
+        newMonth = 12;
+        newYear--;
+      }
+      updateDate(newYear, newMonth, day);
+    } else if (field === "day") {
+      const daysInMonth = new Date(year, month, 0).getDate();
+      let newDay = day + delta;
+      if (newDay > daysInMonth) {
+        newDay = 1;
+      } else if (newDay < 1) {
+        newDay = daysInMonth;
+      }
+      updateDate(year, month, newDay);
+    }
+  };
+
+  const dateParts = parseDateParts();
+
   const hasBase64Previews = frontImagePreview || expirationImagePreview;
   const hasPhotos = photos && photos.length > 0;
 
@@ -210,33 +262,111 @@ export function ScanVerifyDialog({
             />
           </div>
 
-          {/* Category and expiration date in grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1.5">
-                {t("item.category")}
-              </label>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as Category)}
-              >
-                {(["WATER", "CANNED_FOOD", "DRY_GOODS", "FIRST_AID", "TOOLS", "HYGIENE", "DOCUMENTS", "OTHER"] as Category[]).map((value) => (
-                  <option key={value} value={value}>
-                    {t(getCategoryKey(value))}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">
-                {t("item.expirationDate")}
-              </label>
-              <Input
-                type="date"
-                value={expirationDate}
-                onChange={(e) => setExpirationDate(e.target.value)}
-              />
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium mb-1.5">
+              {t("item.category")}
+            </label>
+            <select
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              value={category}
+              onChange={(e) => setCategory(e.target.value as Category)}
+            >
+              {(["WATER", "CANNED_FOOD", "DRY_GOODS", "FIRST_AID", "TOOLS", "HYGIENE", "DOCUMENTS", "OTHER"] as Category[]).map((value) => (
+                <option key={value} value={value}>
+                  {t(getCategoryKey(value))}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Expiration date with increment/decrement buttons */}
+          <div className="bg-muted/50 rounded-lg p-4">
+            <label className="block text-sm font-medium text-center mb-3">
+              {t("item.expirationDate")}
+            </label>
+            <div className="flex items-center justify-center gap-2">
+              {/* Day */}
+              <div className="flex flex-col items-center">
+                <span className="text-xs text-muted-foreground mb-1">{t("date.day")}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-12 rounded-t-md rounded-b-none border-b-0"
+                  onClick={() => adjustDate("day", 1)}
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <div className="h-10 w-12 flex items-center justify-center border border-input bg-background text-lg font-semibold tabular-nums">
+                  {String(dateParts.day).padStart(2, "0")}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-12 rounded-b-md rounded-t-none border-t-0"
+                  onClick={() => adjustDate("day", -1)}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <span className="text-xl font-bold text-muted-foreground self-center">/</span>
+
+              {/* Month */}
+              <div className="flex flex-col items-center">
+                <span className="text-xs text-muted-foreground mb-1">{t("date.month")}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-12 rounded-t-md rounded-b-none border-b-0"
+                  onClick={() => adjustDate("month", 1)}
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <div className="h-10 w-12 flex items-center justify-center border border-input bg-background text-lg font-semibold tabular-nums">
+                  {String(dateParts.month).padStart(2, "0")}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-12 rounded-b-md rounded-t-none border-t-0"
+                  onClick={() => adjustDate("month", -1)}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <span className="text-xl font-bold text-muted-foreground self-center">/</span>
+
+              {/* Year */}
+              <div className="flex flex-col items-center">
+                <span className="text-xs text-muted-foreground mb-1">{t("date.year")}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-16 rounded-t-md rounded-b-none border-b-0"
+                  onClick={() => adjustDate("year", 1)}
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <div className="h-10 w-16 flex items-center justify-center border border-input bg-background text-lg font-semibold tabular-nums">
+                  {dateParts.year}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-16 rounded-b-md rounded-t-none border-t-0"
+                  onClick={() => adjustDate("year", -1)}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
 

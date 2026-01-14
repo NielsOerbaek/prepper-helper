@@ -1125,6 +1125,20 @@ export const translations = {
     en: "days",
   },
 
+  // Date picker
+  "date.day": {
+    da: "Dag",
+    en: "Day",
+  },
+  "date.month": {
+    da: "Måned",
+    en: "Month",
+  },
+  "date.year": {
+    da: "År",
+    en: "Year",
+  },
+
   // Expiring page
   "expiring.itemsWithDates": {
     da: "varer med udløbsdato",

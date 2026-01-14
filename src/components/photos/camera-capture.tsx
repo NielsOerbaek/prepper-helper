@@ -217,8 +217,8 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
   if (twoStep) {
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
+        <DialogContent className="h-[95dvh] max-h-[95dvh] w-[95vw] max-w-[95vw] sm:max-w-[500px] sm:h-auto sm:max-h-none flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>{t("camera.addItem")}</DialogTitle>
             <DialogDescription>
               {isCapturing
@@ -231,14 +231,14 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
           {/* Main capture area or thumbnails */}
           {isCapturing ? (
             // Full camera view when capturing
-            <div className="space-y-3">
-              <div className="relative aspect-[4/3] bg-black rounded-lg overflow-hidden">
+            <div className="flex-1 flex flex-col min-h-0 gap-3">
+              <div className="relative flex-1 min-h-0 bg-black rounded-lg overflow-hidden flex items-center justify-center">
                 <video
                   ref={videoRef}
                   autoPlay
                   playsInline
                   muted
-                  className="w-full h-full object-cover"
+                  className="max-w-full max-h-full object-contain"
                 />
                 {/* Overlay showing which slot we're capturing */}
                 <div className="absolute top-3 left-3 bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-medium">
@@ -276,7 +276,7 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
               </div>
 
               {/* Thumbnails below camera */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex-shrink-0 grid grid-cols-2 gap-3">
                 <div
                   className={`relative aspect-video rounded-lg overflow-hidden ${frontImage ? "ring-2 ring-green-500" : "border-2 border-dashed border-muted-foreground/30 bg-muted"}`}
                   onClick={() => frontImage && retakeSlot("front")}
@@ -402,7 +402,7 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
             className="hidden"
           />
 
-          <DialogFooter className="flex flex-col gap-2">
+          <DialogFooter className="flex-shrink-0 flex flex-col gap-2">
             {isCapturing ? (
               // Capturing mode - simplified footer
               <div className="flex w-full justify-between items-center">
@@ -455,20 +455,20 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
   // Single-step UI (original behavior)
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
+      <DialogContent className="h-[95dvh] max-h-[95dvh] w-[95vw] max-w-[95vw] sm:max-w-[500px] sm:h-auto sm:max-h-none flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{t("camera.title")}</DialogTitle>
           <DialogDescription>
             {t("camera.description")}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
+        <div className="relative flex-1 min-h-0 bg-muted rounded-lg overflow-hidden flex items-center justify-center">
           {capturedImage ? (
             <img
               src={capturedImage}
               alt={t("camera.captured")}
-              className="w-full h-full object-cover"
+              className="max-w-full max-h-full object-contain"
             />
           ) : stream ? (
             <video
@@ -476,7 +476,7 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
               autoPlay
               playsInline
               muted
-              className="w-full h-full object-cover"
+              className="max-w-full max-h-full object-contain"
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-full gap-4">
@@ -519,7 +519,7 @@ export function CameraCapture({ open, onOpenChange, onCapture, onAddManually, tw
           className="hidden"
         />
 
-        <DialogFooter className="flex gap-2">
+        <DialogFooter className="flex-shrink-0 flex gap-2">
           {capturedImage ? (
             <>
               <Button variant="outline" onClick={() => { setCapturedImage(null); startCamera(); }} disabled={isProcessing}>

@@ -11,7 +11,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <LanguageProvider>
         <StashProvider>
           {children}
-          <Toaster position="top-right" />
+          <Toaster position="top-right" duration={3000} />
         </StashProvider>
       </LanguageProvider>
     </SessionProvider>
