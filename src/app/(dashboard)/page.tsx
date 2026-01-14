@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExpirationBadge } from "@/components/items/expiration-badge";
 import { useLanguage } from "@/lib/language-context";
 import { useStash } from "@/lib/stash-context";
-import { Package, ClipboardList, AlertTriangle, ArrowRight, Camera } from "lucide-react";
+import { Package, ClipboardList, AlertTriangle, ArrowRight, Camera, Mail, Check, X } from "lucide-react";
+import { toast } from "sonner";
 
 interface DashboardStats {
   totalItems: number;
@@ -20,11 +21,73 @@ interface DashboardStats {
   }>;
 }
 
+interface UserInvitation {
+  id: string;
+  stashId: string;
+  stashName: string;
+  createdAt: string;
+  expiresAt: string;
+}
+
 export default function DashboardPage() {
   const { t } = useLanguage();
-  const { currentStash, isLoading: stashLoading } = useStash();
+  const { currentStash, isLoading: stashLoading, refreshStashes, setCurrentStash, stashes } = useStash();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userInvitations, setUserInvitations] = useState<UserInvitation[]>([]);
+
+  const fetchUserInvitations = useCallback(async () => {
+    try {
+      const response = await fetch("/api/invitations");
+      if (!response.ok) throw new Error("Failed to fetch invitations");
+      const data = await response.json();
+      setUserInvitations(data);
+    } catch (error) {
+      console.error("Failed to fetch invitations:", error);
+    }
+  }, []);
+
+  const handleAcceptInvitation = async (invitationId: string) => {
+    try {
+      const response = await fetch(`/api/invitations/${invitationId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "accept" }),
+      });
+
+      if (!response.ok) throw new Error("Failed to accept invitation");
+
+      const data = await response.json();
+      toast.success(t("stash.invitationAccepted"));
+      await refreshStashes();
+      fetchUserInvitations();
+
+      // Switch to the new stash
+      const newStash = stashes.find((s) => s.id === data.stashId);
+      if (newStash) {
+        setCurrentStash(newStash);
+      }
+    } catch {
+      toast.error(t("toast.updateFailed"));
+    }
+  };
+
+  const handleDeclineInvitation = async (invitationId: string) => {
+    try {
+      const response = await fetch(`/api/invitations/${invitationId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "decline" }),
+      });
+
+      if (!response.ok) throw new Error("Failed to decline invitation");
+
+      toast.success(t("stash.invitationDeclined"));
+      fetchUserInvitations();
+    } catch {
+      toast.error(t("toast.updateFailed"));
+    }
+  };
 
   useEffect(() => {
     async function fetchStats() {
@@ -80,6 +143,10 @@ export default function DashboardPage() {
     }
   }, [currentStash, stashLoading]);
 
+  useEffect(() => {
+    fetchUserInvitations();
+  }, [fetchUserInvitations]);
+
   if (loading || stashLoading) {
     return (
       <div className="space-y-6">
@@ -109,6 +176,40 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">{t("nav.dashboard")}</h1>
       </div>
+
+      {/* Pending Invitations */}
+      {userInvitations.length > 0 && (
+        <Card className="border-primary bg-primary/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Mail className="h-5 w-5" />
+              {t("stash.yourInvitations")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {userInvitations.map((invitation) => (
+              <div key={invitation.id} className="flex items-center justify-between p-3 rounded-lg border bg-background">
+                <div>
+                  <p className="font-medium">{invitation.stashName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("stash.expiresAt")}: {new Date(invitation.expiresAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => handleAcceptInvitation(invitation.id)}>
+                    <Check className="h-4 w-4 mr-1" />
+                    {t("common.accept")}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleDeclineInvitation(invitation.id)}>
+                    <X className="h-4 w-4 mr-1" />
+                    {t("common.decline")}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Prominent Scanner Button */}
       <Card className="bg-gradient-to-br from-primary/20 via-primary/10 to-background border-primary/30">

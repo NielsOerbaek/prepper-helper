@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +30,7 @@ interface Item {
   photos: Array<{ id: string; minioKey: string; originalName: string | null }>;
 }
 
-export default function InventoryPage() {
+function InventoryContent() {
   const { t, language } = useLanguage();
   const { currentStash, isLoading: stashLoading } = useStash();
   const searchParams = useSearchParams();
@@ -43,14 +43,32 @@ export default function InventoryPage() {
   const [showCamera, setShowCamera] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
 
+  // Track if we should open scanner (persists across re-renders while stash loads)
+  const [pendingScan, setPendingScan] = useState(() => {
+    // Check on initial render if scan param is present
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("scan") === "true";
+    }
+    return false;
+  });
+
   // Auto-open scanner if ?scan=true in URL
   useEffect(() => {
-    if (searchParams.get("scan") === "true" && !stashLoading && currentStash) {
-      setShowScanner(true);
-      // Clear the query param
+    // Clear URL param immediately to prevent issues
+    if (searchParams.get("scan") === "true") {
+      setPendingScan(true);
       router.replace("/inventory", { scroll: false });
     }
-  }, [searchParams, stashLoading, currentStash, router]);
+  }, [searchParams, router]);
+
+  // Open scanner when stash is ready and we have a pending scan
+  useEffect(() => {
+    if (pendingScan && !stashLoading && currentStash) {
+      setShowScanner(true);
+      setPendingScan(false);
+    }
+  }, [pendingScan, stashLoading, currentStash]);
   const [showVerifyDialog, setShowVerifyDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [currentItemId, setCurrentItemId] = useState<string | null>(null);
@@ -657,5 +675,13 @@ export default function InventoryPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function InventoryPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+      <InventoryContent />
+    </Suspense>
   );
 }

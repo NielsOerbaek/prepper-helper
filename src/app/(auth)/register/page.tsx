@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -19,8 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
-import { Loader2, Shield } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { AnimatedLogo } from "@/components/ui/animated-logo";
 
@@ -36,12 +35,13 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPromiseLoading, setIsPromiseLoading] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -84,24 +84,13 @@ export default function RegisterPage() {
       if (result?.error) {
         setError(t("auth.registrationSuccessLoginFailed"));
       } else {
-        router.push("/");
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch {
       setError(t("auth.unexpectedError"));
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handlePromiseSignup = async () => {
-    setIsPromiseLoading(true);
-    setError(null);
-    try {
-      await signIn("promise", { callbackUrl: "/" });
-    } catch {
-      setError(t("auth.promiseFailed"));
-      setIsPromiseLoading(false);
     }
   };
 
@@ -121,29 +110,6 @@ export default function RegisterPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handlePromiseSignup}
-            disabled={isPromiseLoading}
-          >
-            {isPromiseLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Shield className="mr-2 h-4 w-4" />
-            )}
-            {t("auth.signUpWithPromise")}
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">{t("auth.orContinueWith")}</span>
-            </div>
-          </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -209,12 +175,20 @@ export default function RegisterPage() {
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
             {t("auth.haveAccount")}{" "}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href={callbackUrl !== "/" ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"} className="text-primary hover:underline">
               {t("auth.signIn")}
             </Link>
           </p>
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }
