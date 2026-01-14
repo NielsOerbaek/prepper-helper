@@ -70,7 +70,7 @@ IMPORTANT: Dates on products are in European format: DD/MM/YYYY or DD.MM.YYYY (d
 Extract the following information and return it as JSON:
 
 1. "name": The product name (be specific, include brand if visible)
-2. "description": A brief description of the item
+2. "description": A brief description including size/quantity if visible (e.g., "500ml", "400g", "6-pack"). Always include weight, volume, or count when available.
 3. "expirationDate": The expiration date from image 2 (format: YYYY-MM-DD), or null if not visible
 4. "category": One of: WATER, CANNED_FOOD, DRY_GOODS, FIRST_AID, TOOLS, HYGIENE, DOCUMENTS, OTHER
 5. "confidence": A number from 0 to 1 indicating how confident you are in the analysis
@@ -80,11 +80,11 @@ ${expirationDateNote}
 ${languageInstruction}
 
 Return ONLY valid JSON, no other text. Example:
-{"name": "Campbell's Chicken Noodle Soup", "description": "Canned soup, ready to heat and serve", "expirationDate": "2025-06-15", "category": "CANNED_FOOD", "confidence": 0.95}`
+{"name": "Campbell's Chicken Noodle Soup", "description": "400g canned soup, ready to heat and serve", "expirationDate": "2025-06-15", "category": "CANNED_FOOD", "confidence": 0.95}`
     : `Analyze this image of a food or emergency supply item. Extract the following information and return it as JSON:
 
 1. "name": The product name (be specific, include brand if visible)
-2. "description": A brief description of the item
+2. "description": A brief description including size/quantity if visible (e.g., "500ml", "400g", "6-pack"). Always include weight, volume, or count when available.
 3. "expirationDate": The expiration date if visible (format: YYYY-MM-DD), or null if not visible
 4. "category": One of: WATER, CANNED_FOOD, DRY_GOODS, FIRST_AID, TOOLS, HYGIENE, DOCUMENTS, OTHER
 5. "confidence": A number from 0 to 1 indicating how confident you are in the analysis
@@ -94,7 +94,7 @@ ${expirationDateNote}
 ${languageInstruction}
 
 Return ONLY valid JSON, no other text. Example:
-{"name": "Campbell's Chicken Noodle Soup", "description": "Canned soup, ready to heat and serve", "expirationDate": "2025-06-15", "category": "CANNED_FOOD", "confidence": 0.95}`;
+{"name": "Campbell's Chicken Noodle Soup", "description": "400g canned soup, ready to heat and serve", "expirationDate": "2025-06-15", "category": "CANNED_FOOD", "confidence": 0.95}`;
 
   console.log("[Anthropic] Sending request to Claude API...");
   console.log("[Anthropic] Model: claude-haiku-4-5");
