@@ -416,7 +416,7 @@ export function ScanVerifyDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex-shrink-0 mt-4 flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-shrink-0 mt-4 flex-row gap-2">
           <Button
             type="button"
             variant="outline"
@@ -424,22 +424,21 @@ export function ScanVerifyDialog({
           >
             {t("common.cancel")}
           </Button>
-          <div className="flex gap-2">
-            {onConfirmAndAddNew && (
-              <Button
-                variant="secondary"
-                onClick={handleConfirmAndAddNew}
-                disabled={isSubmitting || !name}
-              >
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {t("scan.saveAndAddNew")}
-              </Button>
-            )}
-            <Button onClick={handleConfirm} disabled={isSubmitting || !name}>
+          {onConfirmAndAddNew && (
+            <Button
+              variant="secondary"
+              onClick={handleConfirmAndAddNew}
+              disabled={isSubmitting || !name}
+              className="flex-1"
+            >
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t("common.save")}
+              {t("scan.saveAndAddNew")}
             </Button>
-          </div>
+          )}
+          <Button onClick={handleConfirm} disabled={isSubmitting || !name} className="flex-1">
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {t("common.save")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
