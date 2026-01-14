@@ -255,7 +255,7 @@ export default function DashboardPage() {
 
       {/* Three compact metrics */}
       <div className="grid grid-cols-3 gap-2">
-        <Link href="/inventory">
+        <Link href="/inventory" className="block">
           <Card className="h-full hover:bg-muted/50 transition-colors">
             <CardContent className="p-3 text-center">
               <Package className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
@@ -265,7 +265,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/expiring">
+        <Link href="/expiring" className="block">
           <Card className={`h-full hover:bg-muted/50 transition-colors ${stats?.expiringSoonItems ? "border-yellow-500" : ""}`}>
             <CardContent className="p-3 text-center">
               <AlertTriangle className={`h-5 w-5 mx-auto mb-1 ${stats?.expiringSoonItems ? "text-yellow-500" : "text-muted-foreground"}`} />
@@ -275,7 +275,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/expiring">
+        <Link href="/expiring" className="block">
           <Card className={`h-full hover:bg-muted/50 transition-colors ${stats?.expiredItems ? "border-red-500" : ""}`}>
             <CardContent className="p-3 text-center">
               <X className={`h-5 w-5 mx-auto mb-1 ${stats?.expiredItems ? "text-red-500" : "text-muted-foreground"}`} />
@@ -287,17 +287,17 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader className="pb-2">
             <CardTitle>{t("dashboard.recentItems")}</CardTitle>
             <CardDescription>{t("dashboard.recentItemsDescription")}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-hidden">
             {stats?.recentItems && stats.recentItems.length > 0 ? (
               <div className="space-y-2">
                 {stats.recentItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between gap-2 min-w-0">
-                    <span className="font-medium truncate text-sm">{item.name}</span>
+                  <div key={item.id} className="flex items-center justify-between gap-2 overflow-hidden">
+                    <span className="font-medium truncate text-sm flex-1 min-w-0">{item.name}</span>
                     <ExpirationBadge expirationDate={item.expirationDate} />
                   </div>
                 ))}
@@ -320,18 +320,18 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Link href="/checklist" className="block">
-          <Card className="h-full hover:bg-muted/50 transition-colors">
+        <Link href="/checklist" className="block min-w-0">
+          <Card className="h-full hover:bg-muted/50 transition-colors overflow-hidden">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle>{t("dashboard.checklistProgress")}</CardTitle>
-                <ClipboardList className="h-5 w-5 text-muted-foreground" />
+                <ClipboardList className="h-5 w-5 text-muted-foreground flex-shrink-0" />
               </div>
               <CardDescription>
-                {stats?.checklistProgress.checked} {t("common.of")} {stats?.checklistProgress.total} {t("dashboard.itemsChecked")}
+                {stats?.checklistProgress.checked} / {stats?.checklistProgress.total} {t("dashboard.itemsChecked")}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="overflow-hidden">
               {/* Progress bar */}
               <div className="w-full bg-muted rounded-full h-2 mb-3">
                 <div
@@ -342,12 +342,12 @@ export default function DashboardPage() {
 
               {/* Unchecked items examples */}
               {stats?.uncheckedItems && stats.uncheckedItems.length > 0 ? (
-                <div className="space-y-1">
+                <div className="space-y-1 overflow-hidden">
                   <p className="text-xs text-muted-foreground mb-2">{t("dashboard.stillNeeded")}:</p>
                   {stats.uncheckedItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-2 text-sm">
+                    <div key={item.id} className="flex items-center gap-2 text-sm overflow-hidden">
                       <div className="h-4 w-4 rounded border border-muted-foreground/30 flex-shrink-0" />
-                      <span className="truncate">{item.name}</span>
+                      <span className="truncate flex-1 min-w-0">{item.name}</span>
                     </div>
                   ))}
                 </div>
