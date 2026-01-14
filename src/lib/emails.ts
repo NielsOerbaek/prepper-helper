@@ -18,10 +18,10 @@ const baseStyles = `
     padding: 40px 20px;
   }
   .card {
-    background-color: #FAFAF8;
+    background-color: #FFFFFF;
     padding: 32px;
-    border: 3px solid #000000;
-    box-shadow: 6px 6px 0px 0px #000000;
+    border-radius: 12px;
+    border: 1px solid #E5E5E5;
   }
   .logo {
     text-align: center;
@@ -30,8 +30,7 @@ const baseStyles = `
   .logo img {
     width: 64px;
     height: 64px;
-    border: 2px solid #000000;
-    box-shadow: 4px 4px 0px 0px #000000;
+    border-radius: 12px;
   }
   .logo-text {
     font-size: 24px;
@@ -59,18 +58,13 @@ const baseStyles = `
   .button {
     display: inline-block;
     background-color: #F97316;
-    color: #000000 !important;
+    color: #FFFFFF !important;
     text-decoration: none;
     padding: 14px 28px;
     font-weight: 700;
     font-size: 16px;
     margin: 24px 0;
-    border: 3px solid #000000;
-    box-shadow: 4px 4px 0px 0px #000000;
-  }
-  .button:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px 0px #000000;
+    border-radius: 8px;
   }
   .button-container {
     text-align: center;
@@ -79,7 +73,7 @@ const baseStyles = `
     text-align: center;
     margin-top: 32px;
     padding-top: 24px;
-    border-top: 2px solid #000000;
+    border-top: 1px solid #E5E5E5;
   }
   .footer p {
     color: #666666;
@@ -93,8 +87,8 @@ const baseStyles = `
   }
   .expiry-note {
     background-color: #FEF3C7;
-    border: 2px solid #000000;
-    border-left: 6px solid #F97316;
+    border-left: 4px solid #F97316;
+    border-radius: 4px;
     padding: 12px 16px;
     margin: 16px 0;
   }
