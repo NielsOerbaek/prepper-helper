@@ -11,22 +11,33 @@ const minioClient = new Minio.Client({
 const BUCKET_NAME = process.env.MINIO_BUCKET || "photos";
 
 export async function ensureBucket(): Promise<void> {
+  // Skip bucket creation for cloud providers like R2 (create via dashboard)
+  if (process.env.MINIO_SKIP_BUCKET_CREATION === "true") {
+    return;
+  }
+
   const exists = await minioClient.bucketExists(BUCKET_NAME);
   if (!exists) {
     await minioClient.makeBucket(BUCKET_NAME);
     // Set bucket policy to allow public read for photos
-    const policy = {
-      Version: "2012-10-17",
-      Statement: [
-        {
-          Effect: "Allow",
-          Principal: { AWS: ["*"] },
-          Action: ["s3:GetObject"],
-          Resource: [`arn:aws:s3:::${BUCKET_NAME}/*`],
-        },
-      ],
-    };
-    await minioClient.setBucketPolicy(BUCKET_NAME, JSON.stringify(policy));
+    // Note: R2 doesn't support this - configure public access in dashboard
+    try {
+      const policy = {
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Effect: "Allow",
+            Principal: { AWS: ["*"] },
+            Action: ["s3:GetObject"],
+            Resource: [`arn:aws:s3:::${BUCKET_NAME}/*`],
+          },
+        ],
+      };
+      await minioClient.setBucketPolicy(BUCKET_NAME, JSON.stringify(policy));
+    } catch {
+      // Policy setting not supported (e.g., Cloudflare R2)
+      console.warn("Could not set bucket policy - configure public access manually");
+    }
   }
 }
 

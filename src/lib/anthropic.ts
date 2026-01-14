@@ -127,13 +127,31 @@ Return ONLY valid JSON, no other text. Example:
 
   console.log("[Anthropic] Text response:", textContent.text);
 
+  // Extract JSON from the response - handle markdown code blocks
+  let jsonText = textContent.text.trim();
+
+  // Remove markdown code blocks if present (```json ... ``` or ``` ... ```)
+  const codeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlockMatch) {
+    jsonText = codeBlockMatch[1].trim();
+  }
+
+  // Try to find JSON object if there's extra text
+  if (!jsonText.startsWith("{")) {
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonText = jsonMatch[0];
+    }
+  }
+
   try {
-    const result = JSON.parse(textContent.text) as AnalysisResult;
+    const result = JSON.parse(jsonText) as AnalysisResult;
     console.log("[Anthropic] Parsed result:", result);
     return result;
   } catch (parseError) {
     console.error("[Anthropic] JSON parse error:", parseError);
     console.error("[Anthropic] Raw text was:", textContent.text);
+    console.error("[Anthropic] Attempted to parse:", jsonText);
     throw new Error("Failed to parse AI response as JSON");
   }
 }
