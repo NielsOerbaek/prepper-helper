@@ -58,7 +58,9 @@ export async function analyzeImages(
     : "Write the name and description in English.";
 
   const today = new Date().toISOString().split("T")[0];
-  const expirationDateNote = `Note: Today's date is ${today}. Expiration dates are almost never in the past (users are scanning items they're adding to their inventory). If you read a date that appears to be in the past, it's likely you misread it or it's a manufacturing date, not an expiration date. Only return an expirationDate in the past if you are absolutely certain.`;
+  const expirationDateNote = `Note: Today's date is ${today}. Expiration dates are almost never in the past (users are scanning items they're adding to their inventory). If you read a date that appears to be in the past, it's likely you misread it or it's a manufacturing date, not an expiration date. Only return an expirationDate in the past if you are absolutely certain.
+
+IMPORTANT: Dates on products are in European format: DD/MM/YYYY or DD.MM.YYYY (day first, then month, then year). Do NOT interpret dates as US format (MM/DD/YYYY). For example, "05/12/2025" means December 5th 2025, NOT May 12th 2025.`;
 
   const promptText = expirationImage
     ? `You are analyzing two images of a food or emergency supply item:
