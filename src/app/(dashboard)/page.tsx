@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ExpirationBadge } from "@/components/items/expiration-badge";
 import { useLanguage } from "@/lib/language-context";
+import { TranslationKey } from "@/lib/translations";
 import { useStash } from "@/lib/stash-context";
 import { Package, ClipboardList, AlertTriangle, ArrowRight, Camera, Mail, Check, X } from "lucide-react";
 import { toast } from "sonner";
@@ -344,12 +345,17 @@ export default function DashboardPage() {
               {stats?.uncheckedItems && stats.uncheckedItems.length > 0 ? (
                 <div className="space-y-1 overflow-hidden">
                   <p className="text-xs text-muted-foreground mb-2">{t("dashboard.stillNeeded")}:</p>
-                  {stats.uncheckedItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-2 text-sm overflow-hidden">
-                      <div className="h-4 w-4 rounded border border-muted-foreground/30 flex-shrink-0" />
-                      <span className="truncate flex-1 min-w-0">{item.name}</span>
-                    </div>
-                  ))}
+                  {stats.uncheckedItems.map((item) => {
+                    const displayName = item.name.startsWith("checklist.item.")
+                      ? t(item.name as TranslationKey)
+                      : item.name;
+                    return (
+                      <div key={item.id} className="flex items-center gap-2 text-sm overflow-hidden">
+                        <div className="h-4 w-4 rounded border border-muted-foreground/30 flex-shrink-0" />
+                        <span className="truncate flex-1 min-w-0">{displayName}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : stats?.checklistProgress.total === 0 ? (
                 <p className="text-sm text-muted-foreground">{t("dashboard.noChecklist")}</p>
