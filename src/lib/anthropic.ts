@@ -57,6 +57,9 @@ export async function analyzeImages(
     ? "IMPORTANT: Write the name and description in Danish."
     : "Write the name and description in English.";
 
+  const today = new Date().toISOString().split("T")[0];
+  const expirationDateNote = `Note: Today's date is ${today}. Expiration dates are almost never in the past (users are scanning items they're adding to their inventory). If you read a date that appears to be in the past, it's likely you misread it or it's a manufacturing date, not an expiration date. Only return an expirationDate in the past if you are absolutely certain.`;
+
   const promptText = expirationImage
     ? `You are analyzing two images of a food or emergency supply item:
 - Image 1: The front/label of the product
@@ -70,6 +73,8 @@ Extract the following information and return it as JSON:
 4. "category": One of: WATER, CANNED_FOOD, DRY_GOODS, FIRST_AID, TOOLS, HYGIENE, DOCUMENTS, OTHER
 5. "confidence": A number from 0 to 1 indicating how confident you are in the analysis
 
+${expirationDateNote}
+
 ${languageInstruction}
 
 Return ONLY valid JSON, no other text. Example:
@@ -82,17 +87,19 @@ Return ONLY valid JSON, no other text. Example:
 4. "category": One of: WATER, CANNED_FOOD, DRY_GOODS, FIRST_AID, TOOLS, HYGIENE, DOCUMENTS, OTHER
 5. "confidence": A number from 0 to 1 indicating how confident you are in the analysis
 
+${expirationDateNote}
+
 ${languageInstruction}
 
 Return ONLY valid JSON, no other text. Example:
 {"name": "Campbell's Chicken Noodle Soup", "description": "Canned soup, ready to heat and serve", "expirationDate": "2025-06-15", "category": "CANNED_FOOD", "confidence": 0.95}`;
 
   console.log("[Anthropic] Sending request to Claude API...");
-  console.log("[Anthropic] Model: claude-3-5-haiku-20241022");
+  console.log("[Anthropic] Model: claude-haiku-4-5");
   console.log("[Anthropic] Number of images:", imageContent.length);
 
   const response = await anthropic.messages.create({
-    model: "claude-3-5-haiku-20241022",
+    model: "claude-haiku-4-5",
     max_tokens: 1024,
     messages: [
       {
