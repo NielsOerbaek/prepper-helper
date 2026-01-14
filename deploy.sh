@@ -25,6 +25,6 @@ docker compose build app
 
 # Restart the app
 echo "Restarting app..."
-docker compose up -d app
+docker compose up -d --no-deps app
 
 echo "=== Deploy complete ==="
