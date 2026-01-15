@@ -22,7 +22,9 @@ export function usePushNotifications() {
   // Check support and subscription status on mount
   useEffect(() => {
     const checkSupport = async () => {
+      // Check basic support first
       const isSupported =
+        typeof window !== "undefined" &&
         "serviceWorker" in navigator &&
         "PushManager" in window &&
         "Notification" in window;
@@ -40,8 +42,14 @@ export function usePushNotifications() {
         const permission = Notification.permission;
         let isSubscribed = false;
 
-        // Check if already subscribed
-        const registration = await navigator.serviceWorker.getRegistration("/push-sw.js");
+        // Check if already subscribed - with timeout for PWA edge cases
+        const timeoutPromise = new Promise<null>((resolve) =>
+          setTimeout(() => resolve(null), 3000)
+        );
+
+        const registrationPromise = navigator.serviceWorker.getRegistration("/push-sw.js");
+        const registration = await Promise.race([registrationPromise, timeoutPromise]);
+
         if (registration) {
           const subscription = await registration.pushManager.getSubscription();
           isSubscribed = !!subscription;
@@ -56,11 +64,13 @@ export function usePushNotifications() {
         });
       } catch (error) {
         console.error("[PushNotifications] Error checking status:", error);
+        // Still allow enabling notifications even if check fails
         setState((prev) => ({
           ...prev,
           isSupported: true,
           isLoading: false,
-          error: "Failed to check notification status",
+          permission: Notification.permission,
+          error: null, // Don't show error - just let them try to enable
         }));
       }
     };

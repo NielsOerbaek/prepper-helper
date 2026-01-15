@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         body = `${closestExpiringItem.name} expires in ${daysUntil} days`;
       }
       title = "Expiration Alert";
-      url = "/expiring";
+      url = "/inventory?expiration=soon";
     }
 
     // Send to all subscriptions

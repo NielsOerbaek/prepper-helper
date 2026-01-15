@@ -69,7 +69,11 @@ export default function SettingsPage() {
     }
   };
 
-  const handleEnableNotifications = async () => {
+  const handleEnableNotifications = async (e?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent double-firing on touch devices
+    if (e) {
+      e.preventDefault();
+    }
     const success = await subscribe();
     if (success) {
       toast.success(t("toast.notificationsEnabled"));
@@ -181,7 +185,13 @@ export default function SettingsPage() {
                       {t("settings.disable")}
                     </Button>
                   ) : (
-                    <Button size="sm" onClick={handleEnableNotifications} disabled={isLoading}>
+                    <Button
+                      size="sm"
+                      onClick={handleEnableNotifications}
+                      onTouchEnd={handleEnableNotifications}
+                      disabled={isLoading}
+                      className="touch-manipulation"
+                    >
                       {isLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (

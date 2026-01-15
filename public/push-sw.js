@@ -7,21 +7,25 @@ self.addEventListener('push', function(event) {
 
   const data = event.data.json();
 
+  // Add app name prefix if not already present
+  const title = data.title.startsWith('Prepper') ? data.title : `Prepper: ${data.title}`;
+
   const options = {
     body: data.body,
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
-    vibrate: [100, 50, 100],
+    icon: '/icon.png',
+    badge: '/icon.png',
+    vibrate: [200, 100, 200],
     data: {
       url: data.url || '/',
     },
     actions: data.actions || [],
     tag: data.tag || 'default',
     requireInteraction: data.requireInteraction || false,
+    silent: false,
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    self.registration.showNotification(title, options)
   );
 });
 
