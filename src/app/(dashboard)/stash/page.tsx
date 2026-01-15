@@ -455,24 +455,24 @@ export default function StashPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           {stashDetails.members.map((member) => (
-            <div key={member.userId} className="flex items-center justify-between p-3 rounded-lg border">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+            <div key={member.userId} className="flex items-center justify-between gap-2 p-3 rounded-lg border">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
                   {member.name?.[0]?.toUpperCase() || member.email?.[0]?.toUpperCase() || "?"}
                 </div>
-                <div>
-                  <p className="font-medium">
+                <div className="min-w-0">
+                  <p className="font-medium truncate">
                     {member.name || member.email || "Unknown"}
                     {member.userId === session?.user?.id && (
                       <span className="text-muted-foreground ml-1">{t("stash.you")}</span>
                     )}
                   </p>
                   {member.email && member.name && (
-                    <p className="text-sm text-muted-foreground">{member.email}</p>
+                    <p className="text-sm text-muted-foreground truncate">{member.email}</p>
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <Badge variant={member.role === "OWNER" ? "default" : "secondary"}>
                   {t(getRoleKey(member.role))}
                 </Badge>
@@ -508,9 +508,9 @@ export default function StashPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {stashDetails.pendingInvitations.map((invitation) => (
-              <div key={invitation.id} className="flex items-center justify-between p-3 rounded-lg border">
-                <div>
-                  <p className="font-medium">{invitation.email || invitation.userId}</p>
+              <div key={invitation.id} className="flex items-center justify-between gap-2 p-3 rounded-lg border">
+                <div className="min-w-0">
+                  <p className="font-medium truncate">{invitation.email || invitation.userId}</p>
                   <p className="text-sm text-muted-foreground">
                     {t("stash.expiresAt")}: {new Date(invitation.expiresAt).toLocaleDateString()}
                   </p>
@@ -518,7 +518,7 @@ export default function StashPage() {
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  className="text-destructive touch-manipulation"
+                  className="text-destructive touch-manipulation shrink-0"
                   onClick={() => handleCancelInvitation(invitation.id)}
                 >
                   <X className="h-4 w-4" />
