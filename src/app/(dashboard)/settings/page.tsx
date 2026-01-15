@@ -163,8 +163,8 @@ export default function SettingsPage() {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="space-y-0.5 min-w-0">
                     <Label className="text-base">{t("settings.pushNotifications")}</Label>
                     <p className="text-sm text-muted-foreground">
                       {t("settings.pushDescription")}
@@ -176,6 +176,7 @@ export default function SettingsPage() {
                       size="sm"
                       onClick={handleDisableNotifications}
                       disabled={isLoading}
+                      className="shrink-0 self-start sm:self-center"
                     >
                       {isLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -188,9 +189,8 @@ export default function SettingsPage() {
                     <Button
                       size="sm"
                       onClick={handleEnableNotifications}
-                      onTouchEnd={handleEnableNotifications}
                       disabled={isLoading}
-                      className="touch-manipulation"
+                      className="shrink-0 self-start sm:self-center touch-manipulation"
                     >
                       {isLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -209,8 +209,8 @@ export default function SettingsPage() {
                 )}
 
                 {isSubscribed && (
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <div className="space-y-0.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2 border-t">
+                    <div className="space-y-0.5 min-w-0">
                       <Label>{t("settings.testNotification")}</Label>
                       <p className="text-sm text-muted-foreground">
                         {t("settings.testNotificationDescription")}
@@ -221,6 +221,7 @@ export default function SettingsPage() {
                       size="sm"
                       onClick={handleTestNotification}
                       disabled={isSendingTest}
+                      className="shrink-0 self-start sm:self-center"
                     >
                       {isSendingTest ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
