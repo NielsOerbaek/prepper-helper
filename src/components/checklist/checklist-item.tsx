@@ -45,7 +45,7 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
   return (
     <div
       className={cn(
-        "flex items-center gap-3 p-3 rounded-lg border transition-colors",
+        "flex items-center gap-3 p-3 rounded-lg border transition-colors overflow-hidden",
         item.isChecked ? "bg-muted/50" : "bg-background"
       )}
     >
