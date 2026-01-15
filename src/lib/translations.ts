@@ -1654,6 +1654,60 @@ export const translations = {
     da: "Kontanter (små sedler)",
     en: "Cash (small bills)",
   },
+
+  // Setup Guide
+  "setup.title": {
+    da: "Kom godt i gang",
+    en: "Get Started",
+  },
+  "setup.description": {
+    da: "Fuldfør opsætningen for den bedste oplevelse",
+    en: "Complete setup for the best experience",
+  },
+  "setup.accountTitle": {
+    da: "Opret bruger",
+    en: "Create Account",
+  },
+  "setup.accountComplete": {
+    da: "Bruger oprettet",
+    en: "Account created",
+  },
+  "setup.installTitle": {
+    da: "Installer appen",
+    en: "Install the App",
+  },
+  "setup.installDescription": {
+    da: "Føj til din startskærm for hurtig adgang",
+    en: "Add to your home screen for quick access",
+  },
+  "setup.installInstructions": {
+    da: "Tryk Del, derefter \"Føj til hjemmeskærm\"",
+    en: "Tap Share, then \"Add to Home Screen\"",
+  },
+  "setup.installComplete": {
+    da: "App installeret",
+    en: "App installed",
+  },
+  "setup.notificationsTitle": {
+    da: "Aktivér notifikationer",
+    en: "Enable Notifications",
+  },
+  "setup.notificationsDescription": {
+    da: "Få besked når varer udløber",
+    en: "Get alerts when items are expiring",
+  },
+  "setup.notificationsComplete": {
+    da: "Notifikationer aktiveret",
+    en: "Notifications enabled",
+  },
+  "setup.enableNotifications": {
+    da: "Aktivér",
+    en: "Enable",
+  },
+  "setup.dismiss": {
+    da: "Luk",
+    en: "Dismiss",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

@@ -10,6 +10,7 @@ import { TranslationKey } from "@/lib/translations";
 import { useStash } from "@/lib/stash-context";
 import { Package, ClipboardList, AlertTriangle, ArrowRight, Camera, Mail, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import { SetupGuide } from "@/components/setup/setup-guide";
 
 interface DashboardStats {
   totalItems: number;
@@ -203,6 +204,9 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">{t("nav.dashboard")}</h1>
       </div>
+
+      {/* Setup Guide */}
+      <SetupGuide />
 
       {/* Pending Invitations */}
       {userInvitations.length > 0 && (
