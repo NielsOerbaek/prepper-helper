@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ItemCard } from "@/components/items/item-card";
 import { ItemForm } from "@/components/items/item-form";
-import { ItemLightbox } from "@/components/items/item-lightbox";
+import { ItemDetailsModal } from "@/components/items/item-details-modal";
 import { ScanVerifyDialog } from "@/components/items/scan-verify-dialog";
 import { CameraCapture } from "@/components/photos/camera-capture";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CATEGORY_LABELS } from "@/types";
 import { Category } from "@prisma/client";
-import { Plus, Search, Filter, Loader2, LayoutGrid, List, Trash2, Pencil } from "lucide-react";
+import { Plus, Search, Filter, Loader2, LayoutGrid, List } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/language-context";
@@ -86,7 +86,7 @@ function InventoryContent() {
     expirationBase64?: string;
   } | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [lightboxItem, setLightboxItem] = useState<Item | null>(null);
+  const [detailsItem, setDetailsItem] = useState<Item | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
     if (typeof window !== "undefined") {
       return (localStorage.getItem("inventoryViewMode") as "grid" | "list") || "grid";
@@ -504,12 +504,7 @@ function InventoryContent() {
             <ItemCard
               key={item.id}
               item={item}
-              onEdit={(id) => {
-                const itemToEdit = items.find((i) => i.id === id);
-                if (itemToEdit) setEditingItem(itemToEdit);
-              }}
-              onDelete={handleDeleteItem}
-              onAddPhoto={openCameraForItem}
+              onClick={() => setDetailsItem(item)}
             />
           ))}
         </div>
@@ -521,7 +516,6 @@ function InventoryContent() {
                 <th className="text-left px-4 py-3 font-medium">{t("item.name")}</th>
                 <th className="text-center px-4 py-3 font-medium">{t("item.expirationDate")}</th>
                 <th className="text-center px-4 py-3 font-medium w-16 hidden sm:table-cell">{t("item.quantity")}</th>
-                <th className="px-4 py-3 w-24"></th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -535,7 +529,7 @@ function InventoryContent() {
                   <tr
                     key={item.id}
                     className="hover:bg-muted/30 cursor-pointer"
-                    onClick={() => setLightboxItem(item)}
+                    onClick={() => setDetailsItem(item)}
                   >
                     <td className="px-4 py-3">
                       <div>
@@ -562,32 +556,6 @@ function InventoryContent() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-center hidden sm:table-cell">{item.quantity}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingItem(item);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteItem(item.id);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
                   </tr>
                 );
               })}
@@ -667,11 +635,14 @@ function InventoryContent() {
         variant="destructive"
       />
 
-      {lightboxItem && (
-        <ItemLightbox
-          open={!!lightboxItem}
-          onOpenChange={(open) => !open && setLightboxItem(null)}
-          item={lightboxItem}
+      {detailsItem && (
+        <ItemDetailsModal
+          open={!!detailsItem}
+          onOpenChange={(open) => !open && setDetailsItem(null)}
+          item={detailsItem}
+          onEdit={() => setEditingItem(detailsItem)}
+          onAddPhoto={() => openCameraForItem(detailsItem.id)}
+          onDelete={() => handleDeleteItem(detailsItem.id)}
         />
       )}
     </div>

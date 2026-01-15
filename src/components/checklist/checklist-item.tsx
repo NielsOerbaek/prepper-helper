@@ -65,11 +65,11 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
           {displayName}
         </p>
       </div>
-      <Badge variant="outline" className="shrink-0">
+      <Badge variant="outline" className="shrink-0 hidden sm:flex">
         {t(getCategoryKey(item.category))}
       </Badge>
       {item.linkedItemId && (
-        <Badge variant="secondary" className="shrink-0">
+        <Badge variant="secondary" className="shrink-0 hidden sm:flex">
           <Link2 className="h-3 w-3 mr-1" />
           Linked
         </Badge>

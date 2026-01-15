@@ -215,9 +215,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {userInvitations.map((invitation) => (
-              <div key={invitation.id} className="flex items-center justify-between p-3 rounded-lg border bg-background">
-                <div>
-                  <p className="font-medium">{invitation.stashName}</p>
+              <div key={invitation.id} className="flex items-center justify-between gap-2 p-3 rounded-lg border bg-background">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium truncate">{invitation.stashName}</p>
                   <p className="text-sm text-muted-foreground">
                     {t("stash.expiresAt")}: {new Date(invitation.expiresAt).toLocaleDateString()}
                   </p>
@@ -255,7 +255,7 @@ export default function DashboardPage() {
       </Card>
 
       {/* Three compact metrics */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <Link href="/inventory" className="block">
           <Card className="h-full hover:bg-muted/50 transition-colors">
             <CardContent className="p-3 text-center">

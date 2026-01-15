@@ -180,16 +180,16 @@ export default function ChecklistPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{t("checklist.emergencyChecklist")}</h1>
-          <p className="text-muted-foreground">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold truncate">{t("checklist.emergencyChecklist")}</h1>
+          <p className="text-sm text-muted-foreground">
             {checkedCount} {t("common.of")} {items.length} {t("checklist.itemsChecked")} ({progress}%)
           </p>
         </div>
-        <Button onClick={() => setShowAddDialog(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t("checklist.addItem")}
+        <Button onClick={() => setShowAddDialog(true)} className="shrink-0">
+          <Plus className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">{t("checklist.addItem")}</span>
         </Button>
       </div>
 

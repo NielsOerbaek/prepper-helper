@@ -346,9 +346,9 @@ export default function StashPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {userInvitations.map((invitation) => (
-              <div key={invitation.id} className="flex items-center justify-between p-3 rounded-lg border">
-                <div>
-                  <p className="font-medium">{invitation.stashName}</p>
+              <div key={invitation.id} className="flex items-center justify-between gap-2 p-3 rounded-lg border">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium truncate">{invitation.stashName}</p>
                   <p className="text-sm text-muted-foreground">
                     {t("stash.expiresAt")}: {new Date(invitation.expiresAt).toLocaleDateString()}
                   </p>

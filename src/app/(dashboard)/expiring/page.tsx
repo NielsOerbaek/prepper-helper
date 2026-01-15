@@ -2,18 +2,27 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExpirationBadge } from "@/components/items/expiration-badge";
+import { ItemDetailsModal } from "@/components/items/item-details-modal";
+import { ScanVerifyDialog } from "@/components/items/scan-verify-dialog";
+import { CameraCapture } from "@/components/photos/camera-capture";
 import { getExpirationStatus } from "@/types";
 import { Category } from "@prisma/client";
-import { AlertTriangle, Trash2, Loader2, Package } from "lucide-react";
+import { AlertTriangle, Loader2, Package } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useLanguage } from "@/lib/language-context";
 import { useStash } from "@/lib/stash-context";
 import { getCategoryKey } from "@/lib/translations";
+
+interface Photo {
+  id: string;
+  minioKey: string;
+  originalName: string | null;
+}
 
 interface Item {
   id: string;
@@ -22,14 +31,20 @@ interface Item {
   category: Category;
   quantity: number;
   expirationDate: Date;
+  createdAt: Date;
+  photos: Photo[];
 }
 
 export default function ExpiringPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { currentStash, isLoading: stashLoading } = useStash();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [detailsItem, setDetailsItem] = useState<Item | null>(null);
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [currentItemId, setCurrentItemId] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     if (!currentStash) {
@@ -45,9 +60,10 @@ export default function ExpiringPage() {
       // Filter and sort items with expiration dates
       const itemsWithDates = data
         .filter((item: { expirationDate: string | null }) => item.expirationDate)
-        .map((item: { id: string; name: string; description: string | null; category: Category; quantity: number; expirationDate: string }) => ({
+        .map((item: { id: string; name: string; description: string | null; category: Category; quantity: number; expirationDate: string; createdAt: string; photos: Photo[] }) => ({
           ...item,
           expirationDate: new Date(item.expirationDate),
+          createdAt: new Date(item.createdAt),
         }))
         .sort((a: Item, b: Item) => a.expirationDate.getTime() - b.expirationDate.getTime());
 
@@ -84,6 +100,80 @@ export default function ExpiringPage() {
     }
   };
 
+  const handleEditItem = async (values: {
+    name: string;
+    description?: string;
+    category: Category;
+    quantity: number;
+    expirationDate?: string;
+  }) => {
+    if (!editingItem) return;
+
+    try {
+      const response = await fetch(`/api/items/${editingItem.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) throw new Error("Failed to update item");
+
+      toast.success(t("toast.itemUpdated"));
+      setEditingItem(null);
+      fetchItems();
+    } catch {
+      toast.error(t("toast.updateFailed"));
+      throw new Error("Failed to update item");
+    }
+  };
+
+  const openCameraForItem = (itemId: string) => {
+    setCurrentItemId(itemId);
+    setShowCamera(true);
+  };
+
+  const handlePhotoCapture = async (file: File, base64: string) => {
+    if (!currentItemId) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("itemId", currentItemId);
+
+      const uploadResponse = await fetch("/api/photos/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) throw new Error("Failed to upload photo");
+
+      const { photo } = await uploadResponse.json();
+
+      toast.info(t("toast.aiAnalyzing"));
+      const analyzeResponse = await fetch("/api/ai/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          photoId: photo.id,
+          imageBase64: base64,
+          mimeType: file.type,
+          language,
+        }),
+      });
+
+      if (analyzeResponse.ok) {
+        toast.success(t("toast.photoAdded"));
+      } else {
+        toast.success(t("toast.photoAddedAnalysisFailed"));
+      }
+
+      fetchItems();
+    } catch (error) {
+      console.error("Photo upload error:", error);
+      toast.error(t("toast.photoUploadFailed"));
+    }
+  };
+
   const expiredItems = items.filter((item) => getExpirationStatus(item.expirationDate) === "expired");
   const dangerItems = items.filter((item) => getExpirationStatus(item.expirationDate) === "danger");
   const warningItems = items.filter((item) => getExpirationStatus(item.expirationDate) === "warning");
@@ -112,7 +202,10 @@ export default function ExpiringPage() {
   }
 
   const ItemRow = ({ item }: { item: Item }) => (
-    <div className="flex items-center justify-between p-3 rounded-lg border">
+    <div
+      className="flex items-center justify-between p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors"
+      onClick={() => setDetailsItem(item)}
+    >
       <div className="flex-1 min-w-0 mr-4">
         <p className="font-medium truncate">{item.name}</p>
         <div className="flex items-center gap-2 mt-1">
@@ -122,17 +215,7 @@ export default function ExpiringPage() {
           <span className="text-xs text-muted-foreground">{t("item.quantity")}: {item.quantity}</span>
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <ExpirationBadge expirationDate={item.expirationDate} />
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-destructive hover:text-destructive"
-          onClick={() => handleDelete(item.id)}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
+      <ExpirationBadge expirationDate={item.expirationDate} />
     </div>
   );
 
@@ -240,6 +323,45 @@ export default function ExpiringPage() {
         onConfirm={confirmDelete}
         confirmText={t("confirm.delete")}
         variant="destructive"
+      />
+
+      {detailsItem && (
+        <ItemDetailsModal
+          open={!!detailsItem}
+          onOpenChange={(open) => !open && setDetailsItem(null)}
+          item={detailsItem}
+          onEdit={() => setEditingItem(detailsItem)}
+          onAddPhoto={() => openCameraForItem(detailsItem.id)}
+          onDelete={() => handleDelete(detailsItem.id)}
+        />
+      )}
+
+      {editingItem && (
+        <ScanVerifyDialog
+          open={!!editingItem}
+          onOpenChange={(open) => !open && setEditingItem(null)}
+          onConfirm={handleEditItem}
+          title={t("inventory.editItem")}
+          initialData={{
+            name: editingItem.name,
+            description: editingItem.description || "",
+            category: editingItem.category,
+            quantity: editingItem.quantity,
+            expirationDate: editingItem.expirationDate
+              ? editingItem.expirationDate.toISOString().split("T")[0]
+              : "",
+          }}
+          photos={editingItem.photos}
+        />
+      )}
+
+      <CameraCapture
+        open={showCamera}
+        onOpenChange={(open) => {
+          setShowCamera(open);
+          if (!open) setCurrentItemId(null);
+        }}
+        onCapture={handlePhotoCapture}
       />
     </div>
   );
