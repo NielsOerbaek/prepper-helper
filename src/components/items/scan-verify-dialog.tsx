@@ -88,7 +88,8 @@ export function ScanVerifyDialog({
     description: description || undefined,
     category,
     quantity,
-    expirationDate: expirationDate || undefined,
+    // Send empty string to explicitly clear the date, undefined means "don't change"
+    expirationDate: expirationDate,
   });
 
   const handleConfirm = async () => {
