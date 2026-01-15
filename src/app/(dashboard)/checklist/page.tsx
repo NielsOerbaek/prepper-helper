@@ -179,7 +179,7 @@ export default function ChecklistPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-hidden">
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl sm:text-3xl font-bold truncate">{t("checklist.emergencyChecklist")}</h1>
@@ -200,7 +200,7 @@ export default function ChecklistPage() {
         />
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid gap-6 overflow-hidden">
         {Object.entries(groupedItems).map(([category, categoryItems]) => (
           <Card key={category}>
             <CardHeader>
@@ -209,7 +209,7 @@ export default function ChecklistPage() {
                 {categoryItems.filter((i) => i.isChecked).length} {t("common.of")} {categoryItems.length} {t("checklist.itemsChecked")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-2 overflow-hidden">
               {categoryItems.map((item) => (
                 <ChecklistItem
                   key={item.id}

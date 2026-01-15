@@ -45,7 +45,7 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
   return (
     <div
       className={cn(
-        "flex items-center gap-2 p-2 sm:p-3 rounded-lg border transition-colors overflow-hidden",
+        "flex items-center gap-2 p-2 sm:p-3 rounded-lg border transition-colors w-full",
         item.isChecked ? "bg-muted/50" : "bg-background"
       )}
     >
@@ -55,15 +55,15 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
         disabled={isUpdating}
         className="h-5 w-5 shrink-0"
       />
-      <p
+      <span
         className={cn(
-          "flex-1 min-w-0 font-medium truncate text-sm sm:text-base",
+          "flex-1 min-w-0 font-medium text-sm sm:text-base overflow-hidden text-ellipsis whitespace-nowrap",
           item.isChecked && "line-through text-muted-foreground"
         )}
         title={displayName}
       >
         {displayName}
-      </p>
+      </span>
       <Badge variant="outline" className="shrink-0 hidden sm:flex">
         {t(getCategoryKey(item.category))}
       </Badge>
