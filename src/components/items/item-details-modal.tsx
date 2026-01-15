@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExpirationBadge } from "./expiration-badge";
@@ -92,6 +92,9 @@ export function ItemDetailsModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-4xl p-0 gap-0 overflow-hidden max-h-[90vh] flex flex-col">
+        {/* Visually hidden title for accessibility */}
+        <DialogTitle className="sr-only">{item.name}</DialogTitle>
+
         {/* Close button */}
         <Button
           variant="ghost"
