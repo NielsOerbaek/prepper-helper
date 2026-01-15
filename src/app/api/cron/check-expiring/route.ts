@@ -104,8 +104,8 @@ export async function GET(request: NextRequest) {
       // Expired items notification
       if (userData.expired.length > 0) {
         const body = userData.expired.length === 1
-          ? `${userData.expired[0]} er udløbet!`
-          : `${userData.expired.length} varer er udløbet!`;
+          ? `${userData.expired[0]} er udløbet`
+          : `${userData.expired.length} varer er udløbet`;
         notifications.push({
           title: "Udløbsadvarsel",
           body,
@@ -118,8 +118,8 @@ export async function GET(request: NextRequest) {
       // Tomorrow expiring notification
       if (userData.tomorrow.length > 0) {
         const body = userData.tomorrow.length === 1
-          ? `${userData.tomorrow[0]} udløber i morgen!`
-          : `${userData.tomorrow.length} varer udløber i morgen!`;
+          ? `${userData.tomorrow[0]} udløber i morgen`
+          : `${userData.tomorrow.length} varer udløber i morgen`;
         notifications.push({
           title: "Udløbsadvarsel",
           body,

@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     });
 
     let title = "Test";
-    let body = "Notifikationer virker!";
+    let body = "Notifikationer virker";
     let url = "/";
 
     // Categorize items
@@ -63,8 +63,8 @@ export async function POST(request: NextRequest) {
     if (expired.length > 0) {
       title = "Udløbsadvarsel";
       body = expired.length === 1
-        ? `${expired[0].name} er udløbet!`
-        : `${expired.length} varer er udløbet!`;
+        ? `${expired[0].name} er udløbet`
+        : `${expired.length} varer er udløbet`;
       url = "/inventory?expiration=expired";
     } else if (expiringSoon.length > 0) {
       title = "Udløbsadvarsel";
