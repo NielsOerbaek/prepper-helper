@@ -188,8 +188,8 @@ export default function ChecklistPage() {
           </p>
         </div>
         <Button onClick={() => setShowAddDialog(true)} className="shrink-0">
-          <Plus className="h-4 w-4 sm:mr-2" />
-          <span className="hidden sm:inline">{t("checklist.addItem")}</span>
+          <Plus className="h-4 w-4 mr-1" />
+          {t("checklist.addItem")}
         </Button>
       </div>
 

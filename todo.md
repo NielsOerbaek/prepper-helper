@@ -1,0 +1,6 @@
+- Buttons still not working on mobile
+- Invitations should show up in your dashboard
+- invitation callbacks should be preserved even if you need to create a user
+- Hide sign in with promise
+- On mobile virkede ?scan=true vist ikke.
+- Pull down to refresh?

@@ -1519,7 +1519,7 @@ export const translations = {
 
   // Default checklist items
   "checklist.item.bottledWater": {
-    da: "Flaskevand (1 gallon per person per dag)",
+    da: "Flaskevand (3 liter per person per døgn)",
     en: "Bottled Water (1 gallon per person per day)",
   },
   "checklist.item.waterPurification": {

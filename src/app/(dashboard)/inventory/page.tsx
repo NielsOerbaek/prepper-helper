@@ -444,9 +444,9 @@ function InventoryContent() {
               <List className="h-4 w-4" />
             </Button>
           </div>
-          <Button variant="outline" size="sm" onClick={() => setShowScanner(true)} className="h-8 sm:h-9">
-            <Plus className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t("inventory.addItem")}</span>
+          <Button size="sm" onClick={() => setShowScanner(true)} className="h-8 sm:h-9">
+            <Plus className="h-4 w-4 mr-1" />
+            {t("inventory.addItem")}
           </Button>
         </div>
       </div>
