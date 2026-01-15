@@ -247,7 +247,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-bold">{t("dashboard.scanAnItem")}</h2>
-              <p className="text-sm text-muted-foreground truncate">{t("dashboard.scanDescription")}</p>
+              <p className="text-sm text-muted-foreground">{t("dashboard.scanDescription")}</p>
             </div>
             <ArrowRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           </Link>

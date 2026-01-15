@@ -10,7 +10,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Prepperhjælper",
-  description: "AI-powered emergency supply inventory management",
+  description: "Semi-intelligent emergency supply inventory management",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Prepperhjælper",
     title: "Prepperhjælper",
-    description: "AI-powered emergency supply inventory management",
+    description: "Semi-intelligent forrådsmanagement",
   },
 };
 
