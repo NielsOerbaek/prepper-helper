@@ -255,7 +255,7 @@ export default function DashboardPage() {
       </Card>
 
       {/* Three compact metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <Link href="/inventory" className="block">
           <Card className="h-full hover:bg-muted/50 transition-colors">
             <CardContent className="p-3 text-center">

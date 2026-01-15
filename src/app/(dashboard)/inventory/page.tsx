@@ -451,8 +451,8 @@ function InventoryContent() {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+      <div className="flex gap-2">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("inventory.search")}
@@ -461,21 +461,18 @@ function InventoryContent() {
             className="pl-10"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value as Category | "")}
-            className="flex h-10 w-full sm:w-[180px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <option value="">{t("inventory.allCategories")}</option>
-            {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {t(getCategoryKey(value))}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value as Category | "")}
+          className="flex h-10 w-[120px] sm:w-[180px] shrink-0 rounded-md border border-input bg-background px-2 sm:px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <option value="">{t("inventory.allCategories")}</option>
+          {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>
+              {t(getCategoryKey(value))}
+            </option>
+          ))}
+        </select>
       </div>
 
       {stashLoading || loading ? (

@@ -85,7 +85,7 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
             <Link2 className="h-4 w-4" />
           </Button>
         )}
-        {!item.isDefault && onDelete && (
+        {onDelete && (
           <Button
             variant="ghost"
             size="sm"
