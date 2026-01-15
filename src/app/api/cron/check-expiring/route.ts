@@ -6,11 +6,16 @@ import { sendPushNotification } from "@/lib/web-push";
 // Configured in vercel.json
 export async function GET(request: NextRequest) {
   try {
-    // Verify Vercel cron secret
+    // Verify cron secret (supports both header formats)
     const authHeader = request.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET;
+    const apiKeyHeader = request.headers.get("x-api-key");
+    const cronSecret = process.env.CRON_SECRET || process.env.CRON_API_KEY;
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const isAuthorized =
+      (authHeader && authHeader === `Bearer ${cronSecret}`) ||
+      (apiKeyHeader && apiKeyHeader === cronSecret);
+
+    if (cronSecret && !isAuthorized) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
