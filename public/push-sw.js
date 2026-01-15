@@ -7,8 +7,8 @@ self.addEventListener('push', function(event) {
 
   const data = event.data.json();
 
-  // Add app name prefix if not already present
-  const title = data.title.startsWith('Prepper') ? data.title : `Prepper: ${data.title}`;
+  // Use title as-is (already in Danish from server)
+  const title = data.title;
 
   const options = {
     body: data.body,

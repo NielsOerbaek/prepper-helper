@@ -20,9 +20,8 @@ export async function GET(request: NextRequest) {
     }
 
     const now = new Date();
-    const notificationThresholds = [7, 3, 1, 0]; // Days before expiration to notify
 
-    // Get all items expiring within 7 days
+    // Get all items expiring within 7 days grouped by user
     const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     const expiringItems = await prisma.item.findMany({
@@ -49,8 +48,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    let notificationsSent = 0;
-    let subscriptionsRemoved = 0;
+    // Group items by user
+    const userItems = new Map<string, {
+      expired: string[];
+      tomorrow: string[];
+      soon: string[];
+      subscriptions: { id: string; endpoint: string; p256dh: string; auth: string }[];
+    }>();
 
     for (const item of expiringItems) {
       if (!item.expirationDate) continue;
@@ -59,42 +63,101 @@ export async function GET(request: NextRequest) {
         (item.expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      // Only notify on threshold days
-      if (!notificationThresholds.includes(daysUntil)) continue;
+      for (const member of item.stash.members) {
+        const userId = member.user.id;
 
-      let title = "Expiration Alert";
-      let body: string;
+        if (!userItems.has(userId)) {
+          userItems.set(userId, {
+            expired: [],
+            tomorrow: [],
+            soon: [],
+            subscriptions: member.user.pushSubscriptions.map(s => ({
+              id: s.id,
+              endpoint: s.endpoint,
+              p256dh: s.p256dh,
+              auth: s.auth,
+            })),
+          });
+        }
 
-      if (daysUntil <= 0) {
-        body = `${item.name} has expired!`;
-      } else if (daysUntil === 1) {
-        body = `${item.name} expires tomorrow!`;
-      } else {
-        body = `${item.name} expires in ${daysUntil} days`;
+        const userData = userItems.get(userId)!;
+
+        if (daysUntil <= 0) {
+          userData.expired.push(item.name);
+        } else if (daysUntil === 1) {
+          userData.tomorrow.push(item.name);
+        } else if (daysUntil <= 7) {
+          userData.soon.push(item.name);
+        }
+      }
+    }
+
+    let notificationsSent = 0;
+    let subscriptionsRemoved = 0;
+
+    // Send one notification per user with aggregated info
+    for (const [, userData] of userItems) {
+      if (userData.subscriptions.length === 0) continue;
+
+      const notifications: { title: string; body: string; url: string; tag: string; requireInteraction: boolean }[] = [];
+
+      // Expired items notification
+      if (userData.expired.length > 0) {
+        const body = userData.expired.length === 1
+          ? `${userData.expired[0]} er udløbet!`
+          : `${userData.expired.length} varer er udløbet!`;
+        notifications.push({
+          title: "Udløbsadvarsel",
+          body,
+          url: "/inventory?expiration=expired",
+          tag: "expired-items",
+          requireInteraction: true,
+        });
       }
 
-      // Send to all stash members with push subscriptions
-      for (const member of item.stash.members) {
-        for (const subscription of member.user.pushSubscriptions) {
+      // Tomorrow expiring notification
+      if (userData.tomorrow.length > 0) {
+        const body = userData.tomorrow.length === 1
+          ? `${userData.tomorrow[0]} udløber i morgen!`
+          : `${userData.tomorrow.length} varer udløber i morgen!`;
+        notifications.push({
+          title: "Udløbsadvarsel",
+          body,
+          url: "/inventory?expiration=soon",
+          tag: "expiring-tomorrow",
+          requireInteraction: true,
+        });
+      }
+
+      // Soon expiring notification (2-7 days)
+      if (userData.soon.length > 0) {
+        const body = userData.soon.length === 1
+          ? `${userData.soon[0]} udløber snart`
+          : `${userData.soon.length} varer udløber snart`;
+        notifications.push({
+          title: "Udløbsadvarsel",
+          body,
+          url: "/inventory?expiration=soon",
+          tag: "expiring-soon",
+          requireInteraction: false,
+        });
+      }
+
+      // Send notifications to all user subscriptions
+      for (const notification of notifications) {
+        for (const subscription of userData.subscriptions) {
           try {
             const success = await sendPushNotification(
               {
                 endpoint: subscription.endpoint,
                 keys: { p256dh: subscription.p256dh, auth: subscription.auth },
               },
-              {
-                title,
-                body,
-                url: "/inventory?expiration=expired",
-                tag: `expiring-${item.id}-${daysUntil}`,
-                requireInteraction: daysUntil <= 1,
-              }
+              notification
             );
 
             if (success) {
               notificationsSent++;
             } else {
-              // Subscription is invalid, remove it
               await prisma.pushSubscription.delete({
                 where: { id: subscription.id },
               });

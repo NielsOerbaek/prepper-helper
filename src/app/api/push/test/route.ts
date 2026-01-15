@@ -25,40 +25,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the item closest to expiration for this user
+    // Find items close to expiration for this user
     const userStashes = await prisma.stashMember.findMany({
       where: { userId: session.user.id },
       select: { stashId: true },
     });
 
     const stashIds = userStashes.map(s => s.stashId);
+    const now = new Date();
+    const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-    const closestExpiringItem = await prisma.item.findFirst({
+    const expiringItems = await prisma.item.findMany({
       where: {
         stashId: { in: stashIds },
-        expirationDate: { not: null },
+        expirationDate: {
+          lte: sevenDaysFromNow,
+          not: null,
+        },
       },
       orderBy: { expirationDate: 'asc' },
-      include: { stash: true },
     });
 
-    let title = "Test Notification";
-    let body = "Push notifications are working!";
+    let title = "Test";
+    let body = "Notifikationer virker!";
     let url = "/";
 
-    if (closestExpiringItem && closestExpiringItem.expirationDate) {
-      const daysUntil = Math.ceil(
-        (closestExpiringItem.expirationDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-      );
+    // Categorize items
+    const expired = expiringItems.filter(item => {
+      const days = Math.ceil((item.expirationDate!.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return days <= 0;
+    });
+    const expiringSoon = expiringItems.filter(item => {
+      const days = Math.ceil((item.expirationDate!.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return days > 0 && days <= 7;
+    });
 
-      if (daysUntil <= 0) {
-        body = `${closestExpiringItem.name} has expired!`;
-      } else if (daysUntil === 1) {
-        body = `${closestExpiringItem.name} expires tomorrow!`;
-      } else {
-        body = `${closestExpiringItem.name} expires in ${daysUntil} days`;
-      }
-      title = "Expiration Alert";
+    if (expired.length > 0) {
+      title = "Udløbsadvarsel";
+      body = expired.length === 1
+        ? `${expired[0].name} er udløbet!`
+        : `${expired.length} varer er udløbet!`;
+      url = "/inventory?expiration=expired";
+    } else if (expiringSoon.length > 0) {
+      title = "Udløbsadvarsel";
+      body = expiringSoon.length === 1
+        ? `${expiringSoon[0].name} udløber snart`
+        : `${expiringSoon.length} varer udløber snart`;
       url = "/inventory?expiration=soon";
     }
 
