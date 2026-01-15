@@ -26,14 +26,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          "--normal-bg": "hsl(var(--popover) / 0.95)",
+          "--normal-bg": "hsl(0 0% 100% / 0.85)",
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "hsl(var(--border))",
-          "--border-radius": "calc(var(--radius) + 2px)",
         } as React.CSSProperties
       }
       toastOptions={{
-        className: "backdrop-blur-sm border shadow-md !rounded-lg",
+        className: "border shadow-md !rounded-xl",
       }}
       {...props}
     />
