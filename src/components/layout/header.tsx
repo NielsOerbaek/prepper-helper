@@ -38,7 +38,7 @@ export function Header() {
             alt={t("app.name")}
             width={32}
             height={32}
-            className="rounded-md"
+            className="rounded-md shadow-xs"
           />
           <span className="hidden sm:inline">{t("app.name")}</span>
         </Link>
