@@ -14,12 +14,12 @@ export function FloatingNav() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 md:hidden flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 z-50 md:hidden flex flex-col items-end pointer-events-none">
       {/* Nav items - shown when open */}
       <div
         className={cn(
           "flex flex-col gap-2 mb-2 transition-all duration-200 items-end",
-          isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+          isOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4"
         )}
       >
         {navItems.map((item) => (
@@ -44,7 +44,7 @@ export function FloatingNav() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all duration-200",
+          "flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all duration-200 pointer-events-auto",
           isOpen
             ? "bg-muted text-muted-foreground"
             : "bg-primary text-primary-foreground"
@@ -60,7 +60,7 @@ export function FloatingNav() {
       {/* Backdrop when open */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-background/80 -z-10"
+          className="fixed inset-0 bg-background/80 -z-10 pointer-events-auto"
           onClick={() => setIsOpen(false)}
         />
       )}
