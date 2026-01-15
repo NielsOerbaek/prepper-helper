@@ -45,7 +45,7 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
   return (
     <div
       className={cn(
-        "flex items-center gap-3 p-3 rounded-lg border transition-colors overflow-hidden",
+        "flex items-center gap-2 p-2 sm:p-3 rounded-lg border transition-colors overflow-hidden",
         item.isChecked ? "bg-muted/50" : "bg-background"
       )}
     >
@@ -53,18 +53,17 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
         checked={item.isChecked}
         onCheckedChange={handleToggle}
         disabled={isUpdating}
-        className="h-5 w-5"
+        className="h-5 w-5 shrink-0"
       />
-      <div className="flex-1 min-w-0">
-        <p
-          className={cn(
-            "font-medium truncate",
-            item.isChecked && "line-through text-muted-foreground"
-          )}
-        >
-          {displayName}
-        </p>
-      </div>
+      <p
+        className={cn(
+          "flex-1 min-w-0 font-medium truncate text-sm sm:text-base",
+          item.isChecked && "line-through text-muted-foreground"
+        )}
+        title={displayName}
+      >
+        {displayName}
+      </p>
       <Badge variant="outline" className="shrink-0 hidden sm:flex">
         {t(getCategoryKey(item.category))}
       </Badge>
@@ -74,29 +73,15 @@ export function ChecklistItem({ item, onToggle, onDelete, onLink }: ChecklistIte
           Linked
         </Badge>
       )}
-      <div className="flex gap-1 shrink-0">
-        {onLink && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onLink(item.id)}
-            title="Link to inventory item"
-          >
-            <Link2 className="h-4 w-4" />
-          </Button>
-        )}
-        {onDelete && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive"
-            onClick={() => onDelete(item.id)}
-            title="Delete item"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-destructive hover:text-destructive shrink-0 h-8 w-8 p-0"
+        onClick={() => onDelete?.(item.id)}
+        title="Delete item"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
     </div>
   );
 }
