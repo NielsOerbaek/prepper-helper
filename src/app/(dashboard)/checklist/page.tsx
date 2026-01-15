@@ -200,16 +200,16 @@ export default function ChecklistPage() {
         />
       </div>
 
-      <div className="grid gap-6 overflow-hidden">
+      <div className="grid gap-4 overflow-hidden">
         {Object.entries(groupedItems).map(([category, categoryItems]) => (
-          <Card key={category}>
-            <CardHeader>
-              <CardTitle>{t(getCategoryKey(category))}</CardTitle>
-              <CardDescription>
-                {categoryItems.filter((i) => i.isChecked).length} {t("common.of")} {categoryItems.length} {t("checklist.itemsChecked")}
+          <Card key={category} className="py-3">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">{t(getCategoryKey(category))}</CardTitle>
+              <CardDescription className="text-xs">
+                {categoryItems.filter((i) => i.isChecked).length} / {categoryItems.length} {t("checklist.itemsChecked")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2 overflow-hidden">
+            <CardContent className="space-y-1 overflow-hidden">
               {categoryItems.map((item) => (
                 <ChecklistItem
                   key={item.id}

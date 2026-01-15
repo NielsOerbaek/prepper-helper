@@ -37,8 +37,8 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
   const photoUrl = firstPhoto ? `/api/photos/${firstPhoto.id}` : null;
 
   return (
-    <Card className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors" onClick={onClick}>
-      <div className="relative aspect-video bg-muted w-full">
+    <Card className="overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors py-0" onClick={onClick}>
+      <div className="relative aspect-[4/3] bg-muted w-full">
         {photoUrl && !imageError ? (
           <Image
             src={photoUrl}
@@ -50,24 +50,22 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
           />
         ) : (
           <div className="flex items-center justify-center h-full">
-            <ImageIcon className="h-12 w-12 text-muted-foreground" />
+            <ImageIcon className="h-10 w-10 text-muted-foreground" />
           </div>
         )}
         {item.photos.length > 1 && (
-          <Badge className="absolute top-2 right-2" variant="secondary">
+          <Badge className="absolute top-2 right-2 text-xs" variant="secondary">
             +{item.photos.length - 1} {t("item.morePhotos")}
           </Badge>
         )}
       </div>
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg line-clamp-1" title={item.name}>{item.name}</CardTitle>
-          <Badge variant="outline" className="shrink-0">{t(getCategoryKey(item.category))}</Badge>
+      <CardContent className="p-3">
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <h3 className="font-semibold text-sm line-clamp-1" title={item.name}>{item.name}</h3>
+          <Badge variant="outline" className="shrink-0 text-xs">{t(getCategoryKey(item.category))}</Badge>
         </div>
-      </CardHeader>
-      <CardContent className="pb-4">
         {item.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+          <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
             {item.description}
           </p>
         )}
@@ -75,7 +73,7 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
           <ExpirationBadge
             expirationDate={item.expirationDate ? new Date(item.expirationDate) : null}
           />
-          <span className="text-sm text-muted-foreground">{t("item.quantity")}: {item.quantity}</span>
+          <span className="text-xs text-muted-foreground">{t("item.quantity")}: {item.quantity}</span>
         </div>
       </CardContent>
     </Card>
