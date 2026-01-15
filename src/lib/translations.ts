@@ -1504,6 +1504,18 @@ export const translations = {
     da: "Invitation annulleret",
     en: "Invitation canceled",
   },
+  "stash.wrongAccount": {
+    da: "Forkert konto",
+    en: "Wrong account",
+  },
+  "stash.invitationForEmail": {
+    da: "Denne invitation er til",
+    en: "This invitation is for",
+  },
+  "stash.loggedInAs": {
+    da: "Du er logget ind som",
+    en: "You are logged in as",
+  },
   "stash.memberRemoved": {
     da: "Medlem fjernet",
     en: "Member removed",

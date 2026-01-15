@@ -39,6 +39,7 @@ function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const prefillEmail = searchParams.get("email") || "";
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +48,7 @@ function RegisterContent() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      email: "",
+      email: prefillEmail,
       password: "",
       confirmPassword: "",
     },
@@ -175,7 +176,16 @@ function RegisterContent() {
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
             {t("auth.haveAccount")}{" "}
-            <Link href={callbackUrl !== "/" ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"} className="text-primary hover:underline">
+            <Link
+              href={(() => {
+                const params = new URLSearchParams();
+                if (callbackUrl !== "/") params.set("callbackUrl", callbackUrl);
+                if (prefillEmail) params.set("email", prefillEmail);
+                const queryString = params.toString();
+                return `/login${queryString ? `?${queryString}` : ""}`;
+              })()}
+              className="text-primary hover:underline"
+            >
               {t("auth.signIn")}
             </Link>
           </p>

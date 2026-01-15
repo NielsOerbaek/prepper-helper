@@ -8,14 +8,11 @@ interface RouteParams {
 }
 
 // GET /api/invitations/[id] - Get invitation details (for accept page)
+// Add ?preview=true to get basic info without auth (for login page prefill)
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { id } = await params;
+    const isPreview = request.nextUrl.searchParams.get("preview") === "true";
 
     const invitation = await prisma.stashInvitation.findUnique({
       where: { id },
@@ -30,13 +27,31 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Invitation not found" }, { status: 404 });
     }
 
+    // For preview mode, return basic info without auth check
+    if (isPreview) {
+      return NextResponse.json({
+        email: invitation.email,
+        stashName: invitation.stash.name,
+        isExpired: new Date() > invitation.expiresAt,
+      });
+    }
+
+    // Full access requires authentication
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     // Verify this invitation is for the current user
     const isForUser =
       (invitation.userId && invitation.userId === session.user.id) ||
       (invitation.email && session.user.email?.toLowerCase() === invitation.email.toLowerCase());
 
     if (!isForUser) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({
+        error: "Forbidden",
+        invitedEmail: invitation.email
+      }, { status: 403 });
     }
 
     return NextResponse.json({

@@ -517,8 +517,8 @@ export default function StashPage() {
                 </div>
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="text-destructive"
+                  size="icon-sm"
+                  className="text-destructive touch-manipulation"
                   onClick={() => handleCancelInvitation(invitation.id)}
                 >
                   <X className="h-4 w-4" />

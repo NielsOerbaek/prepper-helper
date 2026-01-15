@@ -30,20 +30,38 @@ function AcceptInvitationContent() {
   const [invitation, setInvitation] = useState<InvitationDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [invitedEmail, setInvitedEmail] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState<"accepted" | "declined" | null>(null);
 
   useEffect(() => {
-    if (sessionStatus === "unauthenticated") {
-      // Redirect to login with return URL
+    const handleUnauthenticated = async () => {
+      // First fetch invitation preview to get the email
+      try {
+        const previewResponse = await fetch(`/api/invitations/${invitationId}?preview=true`);
+        if (previewResponse.ok) {
+          const preview = await previewResponse.json();
+          const email = preview.email || "";
+          // Redirect to login with email prefilled
+          const callbackUrl = encodeURIComponent(`/accept-invitation?id=${invitationId}`);
+          router.push(`/login?callbackUrl=${callbackUrl}&email=${encodeURIComponent(email)}`);
+          return;
+        }
+      } catch {
+        // Fallback to login without email
+      }
       router.push(`/login?callbackUrl=${encodeURIComponent(`/accept-invitation?id=${invitationId}`)}`);
+    };
+
+    if (sessionStatus === "unauthenticated") {
+      handleUnauthenticated();
       return;
     }
 
     if (sessionStatus === "authenticated" && invitationId) {
       fetchInvitation();
     }
-  }, [sessionStatus, invitationId]);
+  }, [sessionStatus, invitationId, router]);
 
   const fetchInvitation = async () => {
     try {
@@ -51,6 +69,9 @@ function AcceptInvitationContent() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.invitedEmail) {
+          setInvitedEmail(data.invitedEmail);
+        }
         setError(data.error || "Failed to load invitation");
         return;
       }
@@ -124,13 +145,27 @@ function AcceptInvitationContent() {
   }
 
   if (error) {
+    const isForbidden = error === "Forbidden" && invitedEmail;
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-muted/40">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <XCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <CardTitle>{t("common.error")}</CardTitle>
-            <CardDescription>{error}</CardDescription>
+            <CardTitle>{isForbidden ? t("stash.wrongAccount") : t("common.error")}</CardTitle>
+            <CardDescription>
+              {isForbidden ? (
+                <>
+                  {t("stash.invitationForEmail")}{" "}
+                  <span className="font-semibold text-foreground">{invitedEmail}</span>
+                  <br />
+                  <span className="text-sm mt-2 block">
+                    {t("stash.loggedInAs")} {session?.user?.email}
+                  </span>
+                </>
+              ) : (
+                error
+              )}
+            </CardDescription>
           </CardHeader>
           <CardFooter className="justify-center">
             <Button asChild>
