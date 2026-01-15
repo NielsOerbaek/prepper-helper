@@ -20,8 +20,11 @@ export interface SetupGuideState {
   isDismissed: boolean;
   isLoading: boolean;
   showInstallStep: boolean;
+  notificationsSupported: boolean;
   dismiss: () => void;
   reset: () => void;
+  subscribeToNotifications: () => Promise<boolean>;
+  isSubscribing: boolean;
 }
 
 export function useSetupGuide(): SetupGuideState {
@@ -29,7 +32,7 @@ export function useSetupGuide(): SetupGuideState {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const { isInstalled, isSupported: pwaSupported, isLoading: pwaLoading } = usePwaStatus();
-  const { isSubscribed, isLoading: notifLoading } = usePushNotifications();
+  const { isSubscribed, isLoading: notifLoading, subscribe, isSupported: notifSupported } = usePushNotifications();
 
   // Load dismissed state from localStorage
   useEffect(() => {
@@ -93,7 +96,10 @@ export function useSetupGuide(): SetupGuideState {
     isDismissed,
     isLoading,
     showInstallStep,
+    notificationsSupported: notifSupported,
     dismiss,
     reset,
+    subscribeToNotifications: subscribe,
+    isSubscribing: notifLoading,
   };
 }

@@ -1704,6 +1704,10 @@ export const translations = {
     da: "Aktivér",
     en: "Enable",
   },
+  "setup.notificationsUnsupported": {
+    da: "Installér appen først for at aktivere notifikationer",
+    en: "Install the app first to enable notifications",
+  },
   "setup.dismiss": {
     da: "Luk",
     en: "Dismiss",
