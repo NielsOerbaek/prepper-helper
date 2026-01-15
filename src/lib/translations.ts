@@ -370,6 +370,18 @@ export const translations = {
     da: "Listevisning",
     en: "List view",
   },
+  "inventory.allItems": {
+    da: "Alle",
+    en: "All",
+  },
+  "inventory.expired": {
+    da: "Udløbet",
+    en: "Expired",
+  },
+  "inventory.expiringSoon": {
+    da: "Udløber snart",
+    en: "Expiring soon",
+  },
 
   // Item form
   "item.name": {

@@ -1,4 +1,4 @@
-import { Package, ClipboardList, Clock, Settings, Home, Info, LucideIcon } from "lucide-react";
+import { Package, ClipboardList, Settings, Home, Info, LucideIcon } from "lucide-react";
 import { TranslationKey } from "@/lib/translations";
 
 export interface NavItem {
@@ -22,11 +22,6 @@ export const navItems: NavItem[] = [
     titleKey: "nav.checklist",
     href: "/checklist",
     icon: ClipboardList,
-  },
-  {
-    titleKey: "nav.expiringSoon",
-    href: "/expiring",
-    icon: Clock,
   },
   {
     titleKey: "nav.settings",

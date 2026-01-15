@@ -12,12 +12,15 @@ import { CameraCapture } from "@/components/photos/camera-capture";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CATEGORY_LABELS } from "@/types";
 import { Category } from "@prisma/client";
-import { Plus, Search, Filter, Loader2, LayoutGrid, List } from "lucide-react";
+import { Plus, Search, Filter, Loader2, LayoutGrid, List, AlertTriangle, X, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/language-context";
 import { useStash } from "@/lib/stash-context";
 import { getCategoryKey } from "@/lib/translations";
+import { getExpirationStatus } from "@/types";
+
+type ExpirationFilter = "" | "expired" | "soon";
 
 interface Item {
   id: string;
@@ -39,6 +42,26 @@ function InventoryContent() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<Category | "">("");
+
+  // Expiration filter from URL params
+  const expirationParam = searchParams.get("expiration");
+  const [expirationFilter, setExpirationFilter] = useState<ExpirationFilter>(
+    (expirationParam === "expired" || expirationParam === "soon") ? expirationParam : ""
+  );
+
+  // Update URL when expiration filter changes
+  const handleExpirationFilterChange = (filter: ExpirationFilter) => {
+    setExpirationFilter(filter);
+    const params = new URLSearchParams(searchParams.toString());
+    if (filter) {
+      params.set("expiration", filter);
+    } else {
+      params.delete("expiration");
+    }
+    // Keep scan param handling
+    params.delete("scan");
+    router.replace(`/inventory${params.toString() ? `?${params.toString()}` : ""}`, { scroll: false });
+  };
   const [showAddForm, setShowAddForm] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
@@ -419,6 +442,39 @@ function InventoryContent() {
     setShowScanner(true);
   };
 
+  // Filter items by expiration status
+  const filteredItems = items.filter((item) => {
+    if (!expirationFilter) return true;
+
+    if (!item.expirationDate) return false;
+
+    const now = new Date();
+    const expDate = new Date(item.expirationDate);
+    const daysUntilExpiration = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (expirationFilter === "expired") {
+      return daysUntilExpiration < 0;
+    }
+    if (expirationFilter === "soon") {
+      return daysUntilExpiration >= 0 && daysUntilExpiration <= 30;
+    }
+    return true;
+  });
+
+  // Count items for each filter
+  const expiredCount = items.filter((item) => {
+    if (!item.expirationDate) return false;
+    return new Date(item.expirationDate) < new Date();
+  }).length;
+
+  const soonCount = items.filter((item) => {
+    if (!item.expirationDate) return false;
+    const now = new Date();
+    const expDate = new Date(item.expirationDate);
+    const daysUntilExpiration = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return daysUntilExpiration >= 0 && daysUntilExpiration <= 30;
+  }).length;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-2">
@@ -475,6 +531,36 @@ function InventoryContent() {
         </select>
       </div>
 
+      {/* Expiration filter tabs */}
+      <div className="flex gap-1 overflow-x-auto pb-1">
+        <Button
+          variant={expirationFilter === "" ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() => handleExpirationFilterChange("")}
+          className="h-8 shrink-0"
+        >
+          {t("inventory.allItems")} ({items.length})
+        </Button>
+        <Button
+          variant={expirationFilter === "expired" ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() => handleExpirationFilterChange("expired")}
+          className={`h-8 shrink-0 ${expiredCount > 0 ? "text-red-600" : ""}`}
+        >
+          <X className={`h-4 w-4 mr-1 ${expiredCount > 0 ? "text-red-500" : "text-muted-foreground"}`} />
+          {t("inventory.expired")} ({expiredCount})
+        </Button>
+        <Button
+          variant={expirationFilter === "soon" ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() => handleExpirationFilterChange("soon")}
+          className={`h-8 shrink-0 ${soonCount > 0 ? "text-yellow-600" : ""}`}
+        >
+          <AlertTriangle className={`h-4 w-4 mr-1 ${soonCount > 0 ? "text-yellow-500" : "text-muted-foreground"}`} />
+          {t("inventory.expiringSoon")} ({soonCount})
+        </Button>
+      </div>
+
       {stashLoading || loading ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -483,12 +569,12 @@ function InventoryContent() {
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">{t("stash.noStash")}</p>
         </div>
-      ) : items.length === 0 ? (
+      ) : filteredItems.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">
-            {search || categoryFilter ? t("inventory.noMatch") : t("inventory.noItems")}
+            {search || categoryFilter || expirationFilter ? t("inventory.noMatch") : t("inventory.noItems")}
           </p>
-          {!search && !categoryFilter && (
+          {!search && !categoryFilter && !expirationFilter && (
             <Button onClick={() => setShowScanner(true)}>
               <Plus className="mr-2 h-4 w-4" />
               {t("inventory.addFirstItem")}
@@ -497,7 +583,7 @@ function InventoryContent() {
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {items.map((item) => (
+          {filteredItems.map((item) => (
             <ItemCard
               key={item.id}
               item={item}
@@ -516,7 +602,7 @@ function InventoryContent() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {items.map((item) => {
+              {filteredItems.map((item) => {
                 const daysLeft = item.expirationDate
                   ? Math.ceil((new Date(item.expirationDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
                   : null;

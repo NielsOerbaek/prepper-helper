@@ -266,7 +266,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/expiring" className="block">
+        <Link href="/inventory?expiration=soon" className="block">
           <Card className={`h-full hover:bg-muted/50 transition-colors ${stats?.expiringSoonItems ? "border-yellow-500" : ""}`}>
             <CardContent className="p-3 text-center">
               <AlertTriangle className={`h-5 w-5 mx-auto mb-1 ${stats?.expiringSoonItems ? "text-yellow-500" : "text-muted-foreground"}`} />
@@ -276,7 +276,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/expiring" className="block">
+        <Link href="/inventory?expiration=expired" className="block">
           <Card className={`h-full hover:bg-muted/50 transition-colors ${stats?.expiredItems ? "border-red-500" : ""}`}>
             <CardContent className="p-3 text-center">
               <X className={`h-5 w-5 mx-auto mb-1 ${stats?.expiredItems ? "text-red-500" : "text-muted-foreground"}`} />
